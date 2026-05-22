@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/SiteLayout";
 import { ArrowRight, Heart, Shield, Sparkles } from "lucide-react";
+import logo from "@/assets/logo.png";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -19,6 +20,9 @@ function Index() {
     <SiteLayout>
       {/* HERO */}
       <section className="relative overflow-hidden">
+        <div className="mx-auto max-w-6xl px-5 sm:px-8 pt-10 flex justify-center">
+          <img src={logo} alt="Happy 2 Help Counseling logo" className="w-56 md:w-72 h-auto" />
+        </div>
         <div className="mx-auto max-w-6xl px-5 sm:px-8 pt-16 pb-20 md:pt-24 md:pb-28 grid md:grid-cols-2 gap-12 items-center">
           <div>
             <div className="inline-flex items-center gap-2 text-xs uppercase tracking-widest text-muted-foreground mb-6">

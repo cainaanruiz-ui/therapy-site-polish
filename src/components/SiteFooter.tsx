@@ -1,12 +1,13 @@
 import { Link } from "@tanstack/react-router";
 import { Mail, Phone, MapPin } from "lucide-react";
+import logo from "@/assets/logo.png";
 
 export function SiteFooter() {
   return (
     <footer className="mt-24 border-t border-border bg-secondary/40">
       <div className="mx-auto max-w-6xl px-5 sm:px-8 py-14 grid gap-10 md:grid-cols-4">
         <div className="md:col-span-2">
-          <div className="font-display text-2xl text-primary">Happy 2 Help Counseling</div>
+          <img src={logo} alt="Happy 2 Help Counseling" className="h-20 w-auto" />
           <p className="mt-3 text-sm text-muted-foreground max-w-sm">
             Accessible, personalized mental health support in Atlanta, GA. In-person and virtual sessions.
           </p>
