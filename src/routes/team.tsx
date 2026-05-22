@@ -1,5 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/SiteLayout";
+import luisImg from "@/assets/luis.jpg";
+import karenImg from "@/assets/karen.gif";
 
 export const Route = createFileRoute("/team")({
   component: TeamPage,
@@ -15,7 +17,7 @@ const TEAM = [
   {
     name: "Luis E. Ruiz, LCSW",
     role: "Clinical Director · Therapist",
-    img: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&w=900&q=80",
+    img: luisImg,
     bio: [
       "I am a bilingual (English and Spanish) Licensed Clinical Social Worker with years of experience providing counseling focused on anxiety, depression, trauma, stress management, PTSD, and family and relationship issues.",
       "I believe the goal of therapy is to help clients achieve their personal goals and live life to the fullest using evidence-based psychotherapy. I embrace the therapeutic relationship as an opportunity to connect with clients using a collaborative approach.",
@@ -25,7 +27,7 @@ const TEAM = [
   {
     name: "Karen Sanchez, M.Ed.",
     role: "Therapist",
-    img: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=900&q=80",
+    img: karenImg,
     bio: [
       "Karen brings over 10 years of counseling experience, working extensively with high-trauma populations and supporting children and adolescents through life's most challenging moments. She specializes in working with youth ages 6–18, helping them navigate emotional, behavioral and developmental concerns with compassion and cultural sensitivity.",
       "Karen holds a Master's in School Counseling from Liberty University and is currently pursuing her Doctorate in Counselor Education and Supervision. As a bilingual therapist fluent in English and Spanish, she is passionate about providing accessible, inclusive care for diverse families.",
