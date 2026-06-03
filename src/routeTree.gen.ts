@@ -14,6 +14,7 @@ import { Route as ServicesRouteImport } from './routes/services'
 import { Route as ImmigrationRouteImport } from './routes/immigration'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiBookingRouteImport } from './routes/api/booking'
 
 const TeamRoute = TeamRouteImport.update({
   id: '/team',
@@ -40,6 +41,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiBookingRoute = ApiBookingRouteImport.update({
+  id: '/api/booking',
+  path: '/api/booking',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -47,6 +53,7 @@ export interface FileRoutesByFullPath {
   '/immigration': typeof ImmigrationRoute
   '/services': typeof ServicesRoute
   '/team': typeof TeamRoute
+  '/api/booking': typeof ApiBookingRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -54,6 +61,7 @@ export interface FileRoutesByTo {
   '/immigration': typeof ImmigrationRoute
   '/services': typeof ServicesRoute
   '/team': typeof TeamRoute
+  '/api/booking': typeof ApiBookingRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -62,13 +70,27 @@ export interface FileRoutesById {
   '/immigration': typeof ImmigrationRoute
   '/services': typeof ServicesRoute
   '/team': typeof TeamRoute
+  '/api/booking': typeof ApiBookingRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/contact' | '/immigration' | '/services' | '/team'
+  fullPaths:
+    | '/'
+    | '/contact'
+    | '/immigration'
+    | '/services'
+    | '/team'
+    | '/api/booking'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/contact' | '/immigration' | '/services' | '/team'
-  id: '__root__' | '/' | '/contact' | '/immigration' | '/services' | '/team'
+  to: '/' | '/contact' | '/immigration' | '/services' | '/team' | '/api/booking'
+  id:
+    | '__root__'
+    | '/'
+    | '/contact'
+    | '/immigration'
+    | '/services'
+    | '/team'
+    | '/api/booking'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -77,6 +99,7 @@ export interface RootRouteChildren {
   ImmigrationRoute: typeof ImmigrationRoute
   ServicesRoute: typeof ServicesRoute
   TeamRoute: typeof TeamRoute
+  ApiBookingRoute: typeof ApiBookingRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -116,6 +139,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/booking': {
+      id: '/api/booking'
+      path: '/api/booking'
+      fullPath: '/api/booking'
+      preLoaderRoute: typeof ApiBookingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -125,6 +155,7 @@ const rootRouteChildren: RootRouteChildren = {
   ImmigrationRoute: ImmigrationRoute,
   ServicesRoute: ServicesRoute,
   TeamRoute: TeamRoute,
+  ApiBookingRoute: ApiBookingRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
