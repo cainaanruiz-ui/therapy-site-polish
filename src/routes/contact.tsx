@@ -3,6 +3,9 @@ import { SiteLayout } from "@/components/SiteLayout";
 import { Mail, Phone, MapPin, AlertCircle } from "lucide-react";
 import { useState } from "react";
 
+const BOOKING_API_URL = "https://h2h-booking-api-198737903207.us-east1.run.app";
+const BOOKING_API_KEY = "h2h_9f3k2mQp8xD1";
+
 export const Route = createFileRoute("/contact")({
   component: ContactPage,
   head: () => ({
@@ -14,7 +17,8 @@ export const Route = createFileRoute("/contact")({
 });
 
 function ContactPage() {
-  const [sent, setSent] = useState(false);
+  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [errorMsg, setErrorMsg] = useState("");
 
   return (
     <SiteLayout>
@@ -28,16 +32,35 @@ function ContactPage() {
 
       <section className="mx-auto max-w-6xl px-5 sm:px-8 py-10 grid md:grid-cols-[1.4fr_1fr] gap-10">
         <form
-          onSubmit={(e) => {
+          onSubmit={async (e) => {
             e.preventDefault();
-            const data = new FormData(e.currentTarget);
-            const name = encodeURIComponent(String(data.get("name") || ""));
-            const email = encodeURIComponent(String(data.get("email") || ""));
-            const times = encodeURIComponent(String(data.get("times") || ""));
-            const message = encodeURIComponent(String(data.get("message") || ""));
-            const body = `Name: ${name}%0D%0AEmail: ${email}%0D%0APreferred times: ${times}%0D%0A%0D%0A${message}`;
-            window.location.href = `mailto:Luis@happy2helpcounseling.org?subject=Booking%20Request%20from%20${name}&body=${body}`;
-            setSent(true);
+            const form = e.currentTarget;
+            const data = new FormData(form);
+            const payload = {
+              name: String(data.get("name") || ""),
+              email: String(data.get("email") || ""),
+              times: String(data.get("times") || ""),
+              message: String(data.get("message") || ""),
+            };
+            setStatus("sending");
+            setErrorMsg("");
+            try {
+              const res = await fetch(`${BOOKING_API_URL}/send`, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "x-api-key": BOOKING_API_KEY,
+                },
+                body: JSON.stringify(payload),
+              });
+              if (!res.ok) throw new Error(await res.text());
+              setStatus("sent");
+              form.reset();
+            } catch (err) {
+              console.error("Booking send failed:", err);
+              setStatus("error");
+              setErrorMsg(err instanceof Error ? err.message : "Something went wrong.");
+            }
           }}
           className="bg-card border border-border rounded-3xl p-8 md:p-10 space-y-5"
         >
@@ -46,10 +69,22 @@ function ContactPage() {
           <Field name="email" label="Your email" type="email" required />
           <Field name="times" label="Preferred days/times" />
           <Field name="message" label="Message" textarea />
-          <button type="submit" className="inline-flex items-center rounded-full bg-primary text-primary-foreground px-6 py-3 text-sm font-medium hover:bg-primary/90">
-            Send Booking Request
+          <button
+            type="submit"
+            disabled={status === "sending"}
+            className="inline-flex items-center rounded-full bg-primary text-primary-foreground px-6 py-3 text-sm font-medium hover:bg-primary/90 disabled:opacity-60"
+          >
+            {status === "sending" ? "Sending…" : "Send Booking Request"}
           </button>
-          {sent && <p className="text-sm text-muted-foreground">Opening your email client… If nothing happens, email us at <a className="text-primary hover:underline" href="mailto:Luis@happy2helpcounseling.org">Luis@happy2helpcounseling.org</a>.</p>}
+          {status === "sent" && (
+            <p className="text-sm text-green-700">Thanks! Your request was sent. Luis will reach out shortly.</p>
+          )}
+          {status === "error" && (
+            <p className="text-sm text-destructive">
+              Couldn't send: {errorMsg || "please try again"}. You can also email{" "}
+              <a className="text-primary hover:underline" href="mailto:Luis@happy2helpcounseling.org">Luis@happy2helpcounseling.org</a> or call (404) 692-3539.
+            </p>
+          )}
           <p className="text-xs text-muted-foreground">If you don't receive a confirmation, you can email us directly or call (404) 692-3539.</p>
         </form>
 
