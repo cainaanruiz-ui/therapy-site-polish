@@ -3,9 +3,6 @@ import { SiteLayout } from "@/components/SiteLayout";
 import { Mail, Phone, MapPin, AlertCircle } from "lucide-react";
 import { useState } from "react";
 
-const BOOKING_API_URL = "https://h2h-booking-api-198737903207.us-east1.run.app";
-const BOOKING_API_KEY = "h2h_9f3k2mQp8xD1";
-
 export const Route = createFileRoute("/contact")({
   component: ContactPage,
   head: () => ({
@@ -45,15 +42,17 @@ function ContactPage() {
             setStatus("sending");
             setErrorMsg("");
             try {
-              const res = await fetch(`${BOOKING_API_URL}/send`, {
+              const res = await fetch("/api/booking", {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
-                  "x-api-key": BOOKING_API_KEY,
                 },
                 body: JSON.stringify(payload),
               });
-              if (!res.ok) throw new Error(await res.text());
+              if (!res.ok) {
+                const details = await res.json().catch(() => null);
+                throw new Error(details?.error || "The booking request could not be sent.");
+              }
               setStatus("sent");
               form.reset();
             } catch (err) {
