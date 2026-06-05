@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/SiteLayout";
 import luisImg from "@/assets/luis.jpg";
 import karenImg from "@/assets/karen.gif";
+import brittanyImg from "@/assets/brittany.jpg";
 
 export const Route = createFileRoute("/team")({
   component: TeamPage,
@@ -32,6 +33,16 @@ const TEAM = [
       "Karen brings over 10 years of counseling experience, working extensively with high-trauma populations and supporting children and adolescents through life's most challenging moments. She specializes in working with youth ages 6–18, helping them navigate emotional, behavioral and developmental concerns with compassion and cultural sensitivity.",
       "Karen holds a Master's in School Counseling from Liberty University and is currently pursuing her Doctorate in Counselor Education and Supervision. As a bilingual therapist fluent in English and Spanish, she is passionate about providing accessible, inclusive care for diverse families.",
       "Karen is excited to bring her experience and heart for healing to the Happy 2 Help Counseling team, walking alongside children and families on their journey toward growth and resilience.",
+    ],
+  },
+  {
+    name: "Brittany Henson, MSW",
+    role: "Therapist · New Therapist Loading…",
+    img: brittanyImg,
+    bio: [
+      "🌱 New therapist loading… please be patient, magic is happening! Brittany is the newest addition to the Happy 2 Help Counseling family, and we couldn't be more excited to welcome her.",
+      "Brittany holds a Master of Social Work (MSW) and brings warmth, humor and a deep heart for helping people feel truly seen. She believes therapy should feel less like a checklist and more like a real conversation — where growth, honesty and a little bit of laughter all have a seat at the table.",
+      "A full bio is on its way soon. In the meantime, know that Brittany is ready to walk alongside you with compassion, curiosity and care.",
     ],
   },
 ];
