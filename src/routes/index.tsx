@@ -124,8 +124,8 @@ function Index() {
 }
 
 const QUICK = [
-  { title: "Adult Therapy", img: "https://images.unsplash.com/photo-1573497019418-b400bb3ab074?auto=format&fit=crop&w=800&q=80" },
-  { title: "Child Therapy", img: "https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?auto=format&fit=crop&w=800&q=80" },
-  { title: "Teen Counseling", img: "https://images.unsplash.com/photo-1517021897933-0e0319cfbc28?auto=format&fit=crop&w=800&q=80" },
-  { title: "Couples Counseling", img: "https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?auto=format&fit=crop&w=800&q=80" },
+  { slug: "adult-therapy", title: "Adult Therapy", img: "https://images.unsplash.com/photo-1573497019418-b400bb3ab074?auto=format&fit=crop&w=800&q=80" },
+  { slug: "child-therapy", title: "Child Therapy", img: "https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?auto=format&fit=crop&w=800&q=80" },
+  { slug: "teen-counseling", title: "Teen Counseling", img: "https://images.unsplash.com/photo-1517021897933-0e0319cfbc28?auto=format&fit=crop&w=800&q=80" },
+  { slug: "couples-counseling", title: "Couples Counseling", img: "https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?auto=format&fit=crop&w=800&q=80" },
 ];
