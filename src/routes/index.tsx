@@ -90,7 +90,7 @@ function Index() {
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {QUICK.map((s) => (
-            <Link to="/services" key={s.title} className="group rounded-2xl overflow-hidden bg-card border border-border hover:shadow-[var(--shadow-card)] transition">
+            <Link to="/services/$slug" params={{ slug: s.slug }} key={s.title} className="group rounded-2xl overflow-hidden bg-card border border-border hover:shadow-[var(--shadow-card)] transition">
               <div className="aspect-[4/3] overflow-hidden">
                 <img src={s.img} alt={s.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition duration-700" />
               </div>
