@@ -82,13 +82,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:site", content: "@Lovable" },
       { name: "twitter:title", content: "Happy 2 Help Counseling — Atlanta Therapy, In-Person & Virtual" },
       { name: "twitter:description", content: "Accessible, personalized mental health support in Atlanta, GA. Therapy for adults, teens, children, couples and families. In-person and virtual." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/047eaae4-9ecb-4bc0-8887-74f1d96bc0b1/id-preview-b0701a0f--8e62a351-4267-4d03-ae0d-f2193ca8fc78.lovable.app-1780503969653.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/047eaae4-9ecb-4bc0-8887-74f1d96bc0b1/id-preview-b0701a0f--8e62a351-4267-4d03-ae0d-f2193ca8fc78.lovable.app-1780503969653.png" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" },
+      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=Nunito+Sans:wght@400;500;600;700&display=swap" },
       {
         rel: "stylesheet",
         href: appCss,
