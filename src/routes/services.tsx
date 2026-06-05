@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/SiteLayout";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
+import { SERVICE_DETAILS } from "./services.$slug";
 
 export const Route = createFileRoute("/services")({
   component: ServicesPage,
@@ -12,17 +13,7 @@ export const Route = createFileRoute("/services")({
   }),
 });
 
-const SERVICES = [
-  { title: "Adult Therapy", desc: "One-on-one support for stress, anxiety, depression and life transitions.", img: "https://images.unsplash.com/photo-1573497019418-b400bb3ab074?auto=format&fit=crop&w=900&q=80" },
-  { title: "Child Therapy", desc: "Play-based, developmentally appropriate care for young children.", img: "https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?auto=format&fit=crop&w=900&q=80" },
-  { title: "Teen Counseling", desc: "A safe space for teens navigating identity, school and relationships.", img: "https://images.unsplash.com/photo-1517021897933-0e0319cfbc28?auto=format&fit=crop&w=900&q=80" },
-  { title: "Individual Counseling", desc: "Personalized, goal-oriented therapy tailored to your needs.", img: "https://images.unsplash.com/photo-1544027993-37dbfe43562a?auto=format&fit=crop&w=900&q=80" },
-  { title: "Couples Counseling", desc: "Rebuild connection, communication and trust together.", img: "https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?auto=format&fit=crop&w=900&q=80" },
-  { title: "Family Counseling", desc: "Strengthen relationships and navigate change as a family.", img: "https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&w=900&q=80" },
-  { title: "Group Therapy", desc: "Shared healing and growth in a small, supportive group setting.", img: "https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=900&q=80" },
-  { title: "Parenting Support", desc: "Practical strategies and emotional support for parents.", img: "https://images.unsplash.com/photo-1542884748-2b87b36c6b90?auto=format&fit=crop&w=900&q=80" },
-  { title: "Coaching / Supervision", desc: "Clinical supervision and professional coaching for clinicians.", img: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&w=900&q=80" },
-];
+const SERVICES = SERVICE_DETAILS.map((s) => ({ slug: s.slug, title: s.title, desc: s.tagline, img: s.img }));
 
 const FOCUS = [
   "Anxiety & stress", "Depression & mood concerns", "Relationship challenges",
@@ -48,15 +39,16 @@ function ServicesPage() {
       <section className="mx-auto max-w-6xl px-5 sm:px-8 py-10">
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {SERVICES.map((s) => (
-            <article key={s.title} className="group rounded-2xl overflow-hidden bg-card border border-border hover:shadow-[var(--shadow-card)] transition">
+            <Link to="/services/$slug" params={{ slug: s.slug }} key={s.slug} className="group rounded-2xl overflow-hidden bg-card border border-border hover:shadow-[var(--shadow-card)] transition flex flex-col">
               <div className="aspect-[4/3] overflow-hidden">
                 <img src={s.img} alt={s.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition duration-700" />
               </div>
               <div className="p-6">
                 <h3 className="font-display text-xl text-primary">{s.title}</h3>
                 <p className="mt-2 text-sm text-muted-foreground">{s.desc}</p>
+                <div className="mt-4 text-sm text-primary inline-flex items-center gap-1 font-medium">Learn more <ArrowRight size={14} /></div>
               </div>
-            </article>
+            </Link>
           ))}
         </div>
       </section>
