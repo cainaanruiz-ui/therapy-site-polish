@@ -40,7 +40,7 @@ const TEAM = [
     role: "Therapist · New Therapist Loading…",
     img: brittanyImg,
     bio: [
-      "🌱 New therapist loading… please be patient, magic is happening! Brittany is the newest addition to the Happy 2 Help Counseling family, and we couldn't be more excited to welcome her.",
+      "New therapist loading… please be patient, magic is happening! Brittany is the newest addition to the Happy 2 Help Counseling family, and we couldn't be more excited to welcome her.",
       "Brittany holds a Master of Social Work (MSW) and brings warmth, humor and a deep heart for helping people feel truly seen. She believes therapy should feel less like a checklist and more like a real conversation — where growth, honesty and a little bit of laughter all have a seat at the table.",
       "A full bio is on its way soon. In the meantime, know that Brittany is ready to walk alongside you with compassion, curiosity and care.",
     ],
