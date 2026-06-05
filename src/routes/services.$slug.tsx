@@ -227,7 +227,7 @@ export const Route = createFileRoute("/services/$slug")({
 });
 
 function ServiceDetailPage() {
-  const { service } = Route.useLoaderData();
+  const { service } = Route.useLoaderData() as { service: ServiceDetail };
   return (
     <SiteLayout>
       <section className="mx-auto max-w-6xl px-5 sm:px-8 pt-12 md:pt-16">
