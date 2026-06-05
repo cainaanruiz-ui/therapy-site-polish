@@ -3,7 +3,7 @@ import { SiteLayout } from "@/components/SiteLayout";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { SERVICE_DETAILS } from "./services.$slug";
 
-export const Route = createFileRoute("/services")({
+export const Route = createFileRoute("/services/")({
   component: ServicesPage,
   head: () => ({
     meta: [
