@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TeamRouteImport } from './routes/team'
 import { Route as ImmigrationRouteImport } from './routes/immigration'
+import { Route as CristinaRouteImport } from './routes/cristina'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CareersRouteImport } from './routes/careers'
 import { Route as IndexRouteImport } from './routes/index'
@@ -26,6 +27,11 @@ const TeamRoute = TeamRouteImport.update({
 const ImmigrationRoute = ImmigrationRouteImport.update({
   id: '/immigration',
   path: '/immigration',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CristinaRoute = CristinaRouteImport.update({
+  id: '/cristina',
+  path: '/cristina',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -63,6 +69,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/careers': typeof CareersRoute
   '/contact': typeof ContactRoute
+  '/cristina': typeof CristinaRoute
   '/immigration': typeof ImmigrationRoute
   '/team': typeof TeamRoute
   '/api/booking': typeof ApiBookingRoute
@@ -73,6 +80,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/careers': typeof CareersRoute
   '/contact': typeof ContactRoute
+  '/cristina': typeof CristinaRoute
   '/immigration': typeof ImmigrationRoute
   '/team': typeof TeamRoute
   '/api/booking': typeof ApiBookingRoute
@@ -84,6 +92,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/careers': typeof CareersRoute
   '/contact': typeof ContactRoute
+  '/cristina': typeof CristinaRoute
   '/immigration': typeof ImmigrationRoute
   '/team': typeof TeamRoute
   '/api/booking': typeof ApiBookingRoute
@@ -96,6 +105,7 @@ export interface FileRouteTypes {
     | '/'
     | '/careers'
     | '/contact'
+    | '/cristina'
     | '/immigration'
     | '/team'
     | '/api/booking'
@@ -106,6 +116,7 @@ export interface FileRouteTypes {
     | '/'
     | '/careers'
     | '/contact'
+    | '/cristina'
     | '/immigration'
     | '/team'
     | '/api/booking'
@@ -116,6 +127,7 @@ export interface FileRouteTypes {
     | '/'
     | '/careers'
     | '/contact'
+    | '/cristina'
     | '/immigration'
     | '/team'
     | '/api/booking'
@@ -127,6 +139,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CareersRoute: typeof CareersRoute
   ContactRoute: typeof ContactRoute
+  CristinaRoute: typeof CristinaRoute
   ImmigrationRoute: typeof ImmigrationRoute
   TeamRoute: typeof TeamRoute
   ApiBookingRoute: typeof ApiBookingRoute
@@ -148,6 +161,13 @@ declare module '@tanstack/react-router' {
       path: '/immigration'
       fullPath: '/immigration'
       preLoaderRoute: typeof ImmigrationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cristina': {
+      id: '/cristina'
+      path: '/cristina'
+      fullPath: '/cristina'
+      preLoaderRoute: typeof CristinaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -199,6 +219,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CareersRoute: CareersRoute,
   ContactRoute: ContactRoute,
+  CristinaRoute: CristinaRoute,
   ImmigrationRoute: ImmigrationRoute,
   TeamRoute: TeamRoute,
   ApiBookingRoute: ApiBookingRoute,
@@ -208,3 +229,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
