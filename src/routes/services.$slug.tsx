@@ -430,7 +430,20 @@ function ServiceDetailPage() {
       <section className="mx-auto max-w-6xl px-5 sm:px-8 py-12 grid md:grid-cols-3 gap-10">
         <div className="md:col-span-2">
           <div className="text-xs uppercase tracking-widest text-muted-foreground mb-3">Overview</div>
-          <p className="text-foreground/85 leading-relaxed text-lg">{service.overview}</p>
+          <div className="space-y-4">
+            {service.overview.map((p, i) => (
+              <p key={i} className="text-foreground/85 leading-relaxed text-lg">{p}</p>
+            ))}
+          </div>
+
+          <div className="mt-10">
+            <h2 className="font-display text-2xl text-primary">Signs this might be for you</h2>
+            <ul className="mt-4 space-y-2">
+              {service.signs.map((s) => (
+                <li key={s} className="flex items-start gap-2 text-foreground/85"><CheckCircle2 size={18} className="text-accent mt-0.5 shrink-0" /> {s}</li>
+              ))}
+            </ul>
+          </div>
 
           <div className="mt-10">
             <h2 className="font-display text-2xl text-primary">Our approach</h2>
@@ -439,6 +452,18 @@ function ServiceDetailPage() {
                 <li key={a} className="flex items-start gap-2 text-foreground/85"><CheckCircle2 size={18} className="text-accent mt-0.5 shrink-0" /> {a}</li>
               ))}
             </ul>
+          </div>
+
+          <div className="mt-10">
+            <h2 className="font-display text-2xl text-primary">What to expect</h2>
+            <ol className="mt-4 space-y-3">
+              {service.whatToExpect.map((step, i) => (
+                <li key={step} className="flex items-start gap-3 text-foreground/85">
+                  <span className="shrink-0 w-7 h-7 rounded-full bg-secondary text-primary font-display text-sm flex items-center justify-center">{i + 1}</span>
+                  <span>{step}</span>
+                </li>
+              ))}
+            </ol>
           </div>
 
           <div className="mt-10">
@@ -463,6 +488,22 @@ function ServiceDetailPage() {
             <div><span className="text-muted-foreground">Phone:</span> <a className="text-primary hover:underline" href="tel:14046923539">(404) 692-3539</a></div>
           </div>
         </aside>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-5 sm:px-8 py-12">
+        <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-muted-foreground mb-3">
+          <Sparkles size={14} className="text-accent" /> By the numbers
+        </div>
+        <h2 className="font-display text-3xl text-primary mb-8">Mental health facts worth knowing</h2>
+        <div className="grid sm:grid-cols-2 gap-5">
+          {service.facts.map((f) => (
+            <div key={f.stat} className="bg-card border border-border rounded-2xl p-6">
+              <p className="text-foreground/85 leading-relaxed">{f.stat}</p>
+              <div className="mt-3 text-xs uppercase tracking-widest text-muted-foreground">Source: {f.source}</div>
+            </div>
+          ))}
+        </div>
+        <p className="mt-6 text-xs text-muted-foreground">Statistics shared for education only — they are not a substitute for personalized clinical advice.</p>
       </section>
 
       <section className="mx-auto max-w-6xl px-5 sm:px-8 py-16">
