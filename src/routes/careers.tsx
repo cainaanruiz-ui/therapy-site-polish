@@ -81,7 +81,7 @@ function CareersPage() {
                   Qualifications we need
                 </h3>
                 <ul className="mt-3 space-y-2 text-muted-foreground list-disc list-inside">
-                  <li>Active Georgia license as an LCSW, LPC, LMFT, or Psychologist (or license-eligible with supervision plan).</li>
+                  <li>Licensed or prelicense clinicians welcome. Active Georgia license as an LCSW, LMSW, LPC, LMFT, or Psychologist (or license-eligible with supervision plan).</li>
                   <li>Experience providing therapy to adults, adolescents, children, couples, or families.</li>
                   <li>Strong documentation skills and comfort with electronic health records.</li>
                   <li>Cultural responsiveness and a genuine commitment to serving diverse communities.</li>
