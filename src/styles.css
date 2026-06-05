@@ -86,10 +86,18 @@
   --brand-sage: oklch(0.78 0.05 150);
   --brand-cream: oklch(0.97 0.025 80);
   --brand-warm: oklch(0.72 0.11 55);
+  --love-bg: oklch(0.975 0.02 350);
+  --love-surface: oklch(0.955 0.03 12);
+  --love-rose: oklch(0.78 0.1 10);
+  --love-rose-deep: oklch(0.61 0.16 8);
+  --love-gold: oklch(0.84 0.08 75);
+  --love-ink: oklch(0.32 0.05 345);
   --shadow-soft: 0 10px 40px -12px oklch(0.25 0.04 165 / 0.18);
   --shadow-card: 0 4px 24px -8px oklch(0.25 0.04 165 / 0.12);
   --font-display: 'Fraunces', Georgia, serif;
   --font-body: 'Inter', system-ui, sans-serif;
+  --font-love-display: 'Cormorant Garamond', Georgia, serif;
+  --font-love-body: 'Nunito Sans', system-ui, sans-serif;
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -155,5 +163,23 @@
     font-family: var(--font-display);
     letter-spacing: -0.02em;
     font-weight: 500;
+  }
+
+  .font-love-display {
+    font-family: var(--font-love-display);
+  }
+
+  .font-love-body {
+    font-family: var(--font-love-body);
+  }
+
+  .love-paper {
+    background:
+      linear-gradient(180deg, oklch(1 0 0 / 0.88), oklch(0.985 0.012 15 / 0.96)),
+      repeating-linear-gradient(180deg, transparent 0 33px, oklch(0.87 0.02 10 / 0.55) 33px 34px);
+  }
+
+  .love-glow {
+    box-shadow: 0 20px 80px -30px oklch(0.61 0.16 8 / 0.38);
   }
 }
