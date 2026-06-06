@@ -2,12 +2,14 @@ import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import logo from "@/assets/logo.png";
+import { CartDrawer } from "@/components/CartDrawer";
 
 const links = [
   { to: "/", label: "Home" },
   { to: "/services", label: "Services" },
   { to: "/team", label: "Team" },
   { to: "/immigration", label: "Immigration" },
+  { to: "/shop", label: "Shop" },
   { to: "/careers", label: "Careers" },
   { to: "/contact", label: "Contact" },
 ];
@@ -31,6 +33,7 @@ export function SiteHeader() {
               {l.label}
             </Link>
           ))}
+          <CartDrawer />
           <Link
             to="/contact"
             className="ml-2 inline-flex items-center rounded-full bg-primary text-primary-foreground px-4 py-2 text-sm font-medium hover:bg-primary/90 transition-colors"
@@ -38,13 +41,16 @@ export function SiteHeader() {
             Book a Session
           </Link>
         </nav>
-        <button
-          className="md:hidden p-2 text-primary"
-          onClick={() => setOpen((v) => !v)}
-          aria-label="Toggle menu"
-        >
-          {open ? <X size={22} /> : <Menu size={22} />}
-        </button>
+        <div className="md:hidden flex items-center gap-2">
+          <CartDrawer />
+          <button
+            className="p-2 text-primary"
+            onClick={() => setOpen((v) => !v)}
+            aria-label="Toggle menu"
+          >
+            {open ? <X size={22} /> : <Menu size={22} />}
+          </button>
+        </div>
       </div>
       {open && (
         <div className="md:hidden border-t border-border bg-background">

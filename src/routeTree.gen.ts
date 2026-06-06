@@ -14,7 +14,9 @@ import { Route as ImmigrationRouteImport } from './routes/immigration'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CareersRouteImport } from './routes/careers'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ShopIndexRouteImport } from './routes/shop.index'
 import { Route as ServicesIndexRouteImport } from './routes/services.index'
+import { Route as ShopHandleRouteImport } from './routes/shop.$handle'
 import { Route as ServicesSlugRouteImport } from './routes/services.$slug'
 import { Route as ApiBookingRouteImport } from './routes/api/booking'
 
@@ -43,9 +45,19 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ShopIndexRoute = ShopIndexRouteImport.update({
+  id: '/shop/',
+  path: '/shop/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ServicesIndexRoute = ServicesIndexRouteImport.update({
   id: '/services/',
   path: '/services/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShopHandleRoute = ShopHandleRouteImport.update({
+  id: '/shop/$handle',
+  path: '/shop/$handle',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ServicesSlugRoute = ServicesSlugRouteImport.update({
@@ -67,7 +79,9 @@ export interface FileRoutesByFullPath {
   '/team': typeof TeamRoute
   '/api/booking': typeof ApiBookingRoute
   '/services/$slug': typeof ServicesSlugRoute
+  '/shop/$handle': typeof ShopHandleRoute
   '/services/': typeof ServicesIndexRoute
+  '/shop/': typeof ShopIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -77,7 +91,9 @@ export interface FileRoutesByTo {
   '/team': typeof TeamRoute
   '/api/booking': typeof ApiBookingRoute
   '/services/$slug': typeof ServicesSlugRoute
+  '/shop/$handle': typeof ShopHandleRoute
   '/services': typeof ServicesIndexRoute
+  '/shop': typeof ShopIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -88,7 +104,9 @@ export interface FileRoutesById {
   '/team': typeof TeamRoute
   '/api/booking': typeof ApiBookingRoute
   '/services/$slug': typeof ServicesSlugRoute
+  '/shop/$handle': typeof ShopHandleRoute
   '/services/': typeof ServicesIndexRoute
+  '/shop/': typeof ShopIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -100,7 +118,9 @@ export interface FileRouteTypes {
     | '/team'
     | '/api/booking'
     | '/services/$slug'
+    | '/shop/$handle'
     | '/services/'
+    | '/shop/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -110,7 +130,9 @@ export interface FileRouteTypes {
     | '/team'
     | '/api/booking'
     | '/services/$slug'
+    | '/shop/$handle'
     | '/services'
+    | '/shop'
   id:
     | '__root__'
     | '/'
@@ -120,7 +142,9 @@ export interface FileRouteTypes {
     | '/team'
     | '/api/booking'
     | '/services/$slug'
+    | '/shop/$handle'
     | '/services/'
+    | '/shop/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -131,7 +155,9 @@ export interface RootRouteChildren {
   TeamRoute: typeof TeamRoute
   ApiBookingRoute: typeof ApiBookingRoute
   ServicesSlugRoute: typeof ServicesSlugRoute
+  ShopHandleRoute: typeof ShopHandleRoute
   ServicesIndexRoute: typeof ServicesIndexRoute
+  ShopIndexRoute: typeof ShopIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -171,11 +197,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/shop/': {
+      id: '/shop/'
+      path: '/shop'
+      fullPath: '/shop/'
+      preLoaderRoute: typeof ShopIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/services/': {
       id: '/services/'
       path: '/services'
       fullPath: '/services/'
       preLoaderRoute: typeof ServicesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shop/$handle': {
+      id: '/shop/$handle'
+      path: '/shop/$handle'
+      fullPath: '/shop/$handle'
+      preLoaderRoute: typeof ShopHandleRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/services/$slug': {
@@ -203,18 +243,10 @@ const rootRouteChildren: RootRouteChildren = {
   TeamRoute: TeamRoute,
   ApiBookingRoute: ApiBookingRoute,
   ServicesSlugRoute: ServicesSlugRoute,
+  ShopHandleRoute: ShopHandleRoute,
   ServicesIndexRoute: ServicesIndexRoute,
+  ShopIndexRoute: ShopIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
