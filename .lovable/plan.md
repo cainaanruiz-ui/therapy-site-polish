@@ -1,44 +1,67 @@
+## Custom CardPointe Checkout — Build Plan
 
-## Goal
+Replace Shopify checkout with a custom flow on your Lovable site using CardPointe's Hosted iFrame Tokenizer. You'll still source/fulfill products via CJ Dropshipping manually.
 
-Add a small online store to Happy 2 Help Counseling for wellness products (fidgets, sensory tools, calming items) — without disrupting the existing therapy site.
+### What gets built
 
-## Approach
+1. **Product catalog (Lovable Cloud)**
+   - `products` table: id, name, description, price_cents, image_url, cj_product_id, inventory, active
+   - Admin page `/admin/products` (auth-gated) to add/edit products
+   - Public `/shop` and `/product/:id` pages read from this table
 
-Use **Shopify** as the backend (handles inventory, payments, checkout, shipping, taxes). You'll get a development store for free while building, and only need a paid Shopify plan once you're ready to actually sell. Lovable handles checkout via Shopify's secure flow — no need to build cart/payment logic from scratch.
+2. **Cart**
+   - Client-side cart (Zustand) persisted to localStorage
+   - Cart drawer with quantity, remove, subtotal
+   - `/cart` page
 
-## What I'll build
+3. **Checkout flow** (`/checkout`)
+   - Customer info form (name, email, shipping address)
+   - Shipping cost (flat rate to start — configurable)
+   - Tax (flat % to start — configurable per state later)
+   - CardPointe Hosted iFrame Tokenizer embedded to collect card → returns a token
+   - On submit: server function takes token + order details, calls CardPointe Gateway API to authorize/capture payment
+   - Creates `orders` + `order_items` rows, clears cart, redirects to `/order-confirmation/:id`
 
-### New routes
-- `/shop` — Product catalog grid (image, name, price, "Add to cart")
-- `/shop/$handle` — Single product page (gallery, description, variant selector, quantity, add to cart)
-- `/cart` — Cart drawer or page with line items, quantities, subtotal, "Checkout" button that hands off to Shopify's hosted checkout
+4. **Order management**
+   - `orders` table: id, user_email, total_cents, status, shipping_address, cardpointe_retref, created_at
+   - `order_items` table: order_id, product_id, quantity, price_cents
+   - Admin page `/admin/orders` showing all orders + status (pending → fulfilled → shipped)
+   - Manual "Mark as ordered on CJ" / "Mark as shipped" buttons + tracking number field
 
-### Header/footer updates
-- Add a "Shop" link to the main nav (alongside Services, Team, Contact)
-- Cart icon in the header showing item count
+5. **Email notifications** (Resend)
+   - Order confirmation to customer
+   - New order alert to you
 
-### Design
-- Match the existing warm, calming counseling aesthetic (same fonts, palette, rounded cards)
-- Product cards styled like the existing service cards for consistency
-- Wellness-focused copy framing the shop as an extension of the practice's care
+### What you'll need to provide (later, when ready)
+- CardPointe merchant ID (MID)
+- CardPointe API username + password
+- CardPointe Tokenizer site key
+- Whether you want sandbox or production credentials first
+- Resend API key (for emails) — or skip emails for v1
 
-### State
-- Cart stored in `localStorage` (persists across page loads) with React context
-- Product data fetched live from Shopify Storefront API
+### Technical details
+- Server functions handle all CardPointe API calls (never expose credentials to browser)
+- Tokenizer iframe collects card data → PCI scope stays minimal
+- Tables get RLS: products public-read, orders user-scoped + admin-all via `user_roles`
+- CJ integration stays manual for v1 (you copy orders into CJ); CJ API automation can come later
 
-## What you'll do
+### Build order
+1. DB schema (products, orders, order_items, user_roles)
+2. Admin product CRUD
+3. Shop + product detail pages reading from DB
+4. Cart store + drawer
+5. Checkout page with shipping/customer form (no payment yet)
+6. CardPointe iframe + tokenization
+7. Server function for charge + order creation
+8. Order confirmation page
+9. Admin orders dashboard
+10. Email notifications (optional)
 
-1. Approve the Shopify enable step — I'll prompt you to choose **Create a new store** (free dev store) or **Connect existing store**
-2. After enabling, add your products in the Shopify admin (or I can help script initial products)
-3. When ready to launch: claim the store (starts 30-day free Shopify trial), then pick a Shopify plan to accept real payments
+### Out of scope for v1
+- Automated CJ fulfillment via their API
+- Multi-warehouse shipping calc
+- Discount codes
+- Subscriptions/recurring billing
+- Refunds UI (can be done manually via CardPointe dashboard for now)
 
-## Cost note
-
-- **Building**: $0 — development store is free for as long as you need
-- **Going live**: Requires a paid Shopify subscription after the 30-day trial that starts when you claim the store
-- See [Shopify's pricing page](https://www.shopify.com/pricing) for current plans
-
-## Next step
-
-I'll ask you to pick **new store** vs **existing store**, then enable the Shopify integration.
+I'll start with steps 1–4 in this first pass so you can see the shape, then we'll wire payment last once you have your CardPointe creds.
