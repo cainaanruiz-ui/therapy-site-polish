@@ -74,7 +74,7 @@ function OrdersAdmin() {
 
   return (
     <div className="space-y-3">
-      {(data as OrderRow[]).map((o) => (
+      {(data as unknown as OrderRow[]).map((o) => (
         <div key={o.id} className="rounded-2xl border border-border bg-card overflow-hidden">
           <button
             onClick={() => setOpenId(openId === o.id ? null : o.id)}
