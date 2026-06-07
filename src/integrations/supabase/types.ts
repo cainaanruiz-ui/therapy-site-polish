@@ -14,16 +14,196 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      order_items: {
+        Row: {
+          created_at: string
+          id: string
+          order_id: string
+          product_id: string | null
+          product_name: string
+          quantity: number
+          unit_price_cents: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          order_id: string
+          product_id?: string | null
+          product_name: string
+          quantity: number
+          unit_price_cents: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          order_id?: string
+          product_id?: string | null
+          product_name?: string
+          quantity?: number
+          unit_price_cents?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          cardpointe_response: Json | null
+          cardpointe_retref: string | null
+          carrier: string | null
+          created_at: string
+          customer_email: string
+          customer_name: string
+          id: string
+          notes: string | null
+          phone: string | null
+          shipping_address: Json
+          shipping_cents: number
+          status: Database["public"]["Enums"]["order_status"]
+          subtotal_cents: number
+          tax_cents: number
+          total_cents: number
+          tracking_number: string | null
+          updated_at: string
+        }
+        Insert: {
+          cardpointe_response?: Json | null
+          cardpointe_retref?: string | null
+          carrier?: string | null
+          created_at?: string
+          customer_email: string
+          customer_name: string
+          id?: string
+          notes?: string | null
+          phone?: string | null
+          shipping_address: Json
+          shipping_cents?: number
+          status?: Database["public"]["Enums"]["order_status"]
+          subtotal_cents: number
+          tax_cents?: number
+          total_cents: number
+          tracking_number?: string | null
+          updated_at?: string
+        }
+        Update: {
+          cardpointe_response?: Json | null
+          cardpointe_retref?: string | null
+          carrier?: string | null
+          created_at?: string
+          customer_email?: string
+          customer_name?: string
+          id?: string
+          notes?: string | null
+          phone?: string | null
+          shipping_address?: Json
+          shipping_cents?: number
+          status?: Database["public"]["Enums"]["order_status"]
+          subtotal_cents?: number
+          tax_cents?: number
+          total_cents?: number
+          tracking_number?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      products: {
+        Row: {
+          active: boolean
+          cj_product_id: string | null
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          inventory: number
+          name: string
+          price_cents: number
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          cj_product_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          inventory?: number
+          name: string
+          price_cents: number
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          cj_product_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          inventory?: number
+          name?: string
+          price_cents?: number
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
+      order_status:
+        | "pending"
+        | "paid"
+        | "fulfilled"
+        | "shipped"
+        | "cancelled"
+        | "refunded"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +330,16 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+      order_status: [
+        "pending",
+        "paid",
+        "fulfilled",
+        "shipped",
+        "cancelled",
+        "refunded",
+      ],
+    },
   },
 } as const
