@@ -1,10 +1,12 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { SiteLayout } from "@/components/SiteLayout";
-import { PRODUCTS_QUERY, ShopifyProduct, storefrontApiRequest } from "@/lib/shopify";
 import { Button } from "@/components/ui/button";
-import { useCartStore } from "@/stores/cartStore";
+import { useCartStore, formatCents } from "@/stores/cartStore";
 import { Loader2, ShoppingBag } from "lucide-react";
+import { listProducts } from "@/lib/products.functions";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/shop/")({
   component: ShopPage,
@@ -23,17 +25,48 @@ export const Route = createFileRoute("/shop/")({
       },
     ],
   }),
+  errorComponent: ({ reset }) => {
+    const router = useRouter();
+    return (
+      <SiteLayout>
+        <div className="text-center py-32">
+          <p className="text-muted-foreground">Unable to load the shop.</p>
+          <Button
+            className="mt-4"
+            onClick={() => {
+              router.invalidate();
+              reset();
+            }}
+          >
+            Try again
+          </Button>
+        </div>
+      </SiteLayout>
+    );
+  },
+  notFoundComponent: () => (
+    <SiteLayout>
+      <div className="py-32 text-center text-muted-foreground">Page not found</div>
+    </SiteLayout>
+  ),
 });
 
-async function fetchProducts(): Promise<ShopifyProduct[]> {
-  const data = await storefrontApiRequest(PRODUCTS_QUERY, { first: 50, query: null });
-  return data?.data?.products?.edges || [];
-}
+type Product = {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  price_cents: number;
+  image_url: string | null;
+  inventory: number;
+  active: boolean;
+};
 
 function ShopPage() {
+  const fetchProducts = useServerFn(listProducts);
   const { data: products, isLoading, error } = useQuery({
-    queryKey: ["shopify-products"],
-    queryFn: fetchProducts,
+    queryKey: ["products"],
+    queryFn: () => fetchProducts(),
   });
 
   return (
@@ -61,15 +94,15 @@ function ShopPage() {
         ) : !products || products.length === 0 ? (
           <div className="text-center py-20 rounded-3xl border border-dashed border-border">
             <ShoppingBag className="w-10 h-10 mx-auto text-accent mb-4" />
-            <h2 className="font-display text-2xl text-primary">No products found</h2>
+            <h2 className="font-display text-2xl text-primary">No products yet</h2>
             <p className="mt-2 text-muted-foreground max-w-md mx-auto">
-              The shop is coming soon. Check back shortly for our curated wellness collection.
+              Our curated wellness collection is coming soon.
             </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {products.map((product) => (
-              <ProductCard key={product.node.id} product={product} />
+            {products.map((p) => (
+              <ProductCard key={p.id} product={p as Product} />
             ))}
           </div>
         )}
@@ -78,36 +111,31 @@ function ShopPage() {
   );
 }
 
-function ProductCard({ product }: { product: ShopifyProduct }) {
+function ProductCard({ product }: { product: Product }) {
   const addItem = useCartStore((s) => s.addItem);
-  const isLoading = useCartStore((s) => s.isLoading);
-  const variant = product.node.variants.edges[0]?.node;
-  const image = product.node.images.edges[0]?.node;
-  const price = product.node.priceRange.minVariantPrice;
 
-  const handleAdd = async () => {
-    if (!variant) return;
-    await addItem({
-      product,
-      variantId: variant.id,
-      variantTitle: variant.title,
-      price: variant.price,
-      quantity: 1,
-      selectedOptions: variant.selectedOptions || [],
+  const handleAdd = () => {
+    addItem({
+      productId: product.id,
+      slug: product.slug,
+      name: product.name,
+      imageUrl: product.image_url,
+      priceCents: product.price_cents,
     });
+    toast.success(`${product.name} added to cart`);
   };
 
   return (
     <div className="group rounded-3xl bg-card border border-border overflow-hidden flex flex-col">
       <Link
         to="/shop/$handle"
-        params={{ handle: product.node.handle }}
+        params={{ handle: product.slug }}
         className="block aspect-square bg-secondary/40 overflow-hidden"
       >
-        {image ? (
+        {product.image_url ? (
           <img
-            src={image.url}
-            alt={image.altText || product.node.title}
+            src={product.image_url}
+            alt={product.name}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
         ) : (
@@ -119,25 +147,20 @@ function ProductCard({ product }: { product: ShopifyProduct }) {
       <div className="p-6 flex flex-col flex-1">
         <Link
           to="/shop/$handle"
-          params={{ handle: product.node.handle }}
+          params={{ handle: product.slug }}
           className="font-display text-xl text-primary hover:underline"
         >
-          {product.node.title}
+          {product.name}
         </Link>
         <p className="mt-2 text-sm text-muted-foreground line-clamp-2 flex-1">
-          {product.node.description}
+          {product.description}
         </p>
         <div className="mt-4 flex items-center justify-between gap-3">
           <span className="text-lg font-semibold text-foreground">
-            ${parseFloat(price.amount).toFixed(2)}
+            {formatCents(product.price_cents)}
           </span>
-          <Button
-            onClick={handleAdd}
-            disabled={isLoading || !variant || !variant.availableForSale}
-            className="rounded-full"
-            size="sm"
-          >
-            {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Add to cart"}
+          <Button onClick={handleAdd} className="rounded-full" size="sm">
+            Add to cart
           </Button>
         </div>
       </div>

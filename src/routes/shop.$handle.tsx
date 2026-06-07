@@ -1,11 +1,13 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { SiteLayout } from "@/components/SiteLayout";
-import { PRODUCT_BY_HANDLE_QUERY, storefrontApiRequest } from "@/lib/shopify";
 import { Button } from "@/components/ui/button";
-import { useCartStore } from "@/stores/cartStore";
+import { useCartStore, formatCents } from "@/stores/cartStore";
 import { Loader2, ArrowLeft, Minus, Plus } from "lucide-react";
+import { getProductBySlug } from "@/lib/products.functions";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/shop/$handle")({
   component: ProductPage,
@@ -15,45 +17,41 @@ export const Route = createFileRoute("/shop/$handle")({
       { name: "description", content: "Wellness product from Happy 2 Help Counseling." },
     ],
   }),
+  errorComponent: ({ reset }) => {
+    const router = useRouter();
+    return (
+      <SiteLayout>
+        <div className="text-center py-32">
+          <p className="text-muted-foreground">Couldn't load this product.</p>
+          <Button
+            className="mt-4"
+            onClick={() => {
+              router.invalidate();
+              reset();
+            }}
+          >
+            Try again
+          </Button>
+        </div>
+      </SiteLayout>
+    );
+  },
+  notFoundComponent: () => (
+    <SiteLayout>
+      <div className="py-32 text-center text-muted-foreground">Product not found</div>
+    </SiteLayout>
+  ),
 });
-
-interface ProductDetail {
-  id: string;
-  title: string;
-  description: string;
-  handle: string;
-  priceRange: { minVariantPrice: { amount: string; currencyCode: string } };
-  images: { edges: Array<{ node: { url: string; altText: string | null } }> };
-  variants: {
-    edges: Array<{
-      node: {
-        id: string;
-        title: string;
-        price: { amount: string; currencyCode: string };
-        availableForSale: boolean;
-        selectedOptions: Array<{ name: string; value: string }>;
-      };
-    }>;
-  };
-  options: Array<{ name: string; values: string[] }>;
-}
-
-async function fetchProduct(handle: string): Promise<ProductDetail | null> {
-  const data = await storefrontApiRequest(PRODUCT_BY_HANDLE_QUERY, { handle });
-  return data?.data?.product || null;
-}
 
 function ProductPage() {
   const { handle } = Route.useParams();
+  const fetchProduct = useServerFn(getProductBySlug);
   const { data: product, isLoading } = useQuery({
-    queryKey: ["shopify-product", handle],
-    queryFn: () => fetchProduct(handle),
+    queryKey: ["product", handle],
+    queryFn: () => fetchProduct({ data: { slug: handle } }),
   });
-  const [variantIdx, setVariantIdx] = useState(0);
   const [quantity, setQuantity] = useState(1);
-  const [imgIdx, setImgIdx] = useState(0);
   const addItem = useCartStore((s) => s.addItem);
-  const isAdding = useCartStore((s) => s.isLoading);
 
   if (isLoading) {
     return (
@@ -70,7 +68,6 @@ function ProductPage() {
       <SiteLayout>
         <div className="mx-auto max-w-3xl px-5 sm:px-8 py-24 text-center">
           <h1 className="font-display text-4xl text-primary">Product not found</h1>
-          <p className="mt-3 text-muted-foreground">We couldn't find that item.</p>
           <Link
             to="/shop"
             className="mt-6 inline-flex items-center gap-2 text-primary hover:underline"
@@ -82,20 +79,18 @@ function ProductPage() {
     );
   }
 
-  const variant = product.variants.edges[variantIdx]?.node;
-  const images = product.images.edges;
-  const mainImage = images[imgIdx]?.node;
-
-  const handleAdd = async () => {
-    if (!variant) return;
-    await addItem({
-      product: { node: product },
-      variantId: variant.id,
-      variantTitle: variant.title,
-      price: variant.price,
+  const handleAdd = () => {
+    addItem(
+      {
+        productId: product.id,
+        slug: product.slug,
+        name: product.name,
+        imageUrl: product.image_url,
+        priceCents: product.price_cents,
+      },
       quantity,
-      selectedOptions: variant.selectedOptions || [],
-    });
+    );
+    toast.success(`${product.name} added to cart`);
   };
 
   return (
@@ -108,65 +103,25 @@ function ProductPage() {
           <ArrowLeft size={14} /> Back to shop
         </Link>
         <div className="grid md:grid-cols-2 gap-10 lg:gap-16">
-          <div>
-            <div className="aspect-square rounded-3xl overflow-hidden bg-secondary/40 border border-border">
-              {mainImage && (
-                <img
-                  src={mainImage.url}
-                  alt={mainImage.altText || product.title}
-                  className="w-full h-full object-cover"
-                />
-              )}
-            </div>
-            {images.length > 1 && (
-              <div className="mt-4 flex gap-3 flex-wrap">
-                {images.map((img, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setImgIdx(i)}
-                    className={`w-20 h-20 rounded-xl overflow-hidden border-2 ${
-                      i === imgIdx ? "border-primary" : "border-border"
-                    }`}
-                  >
-                    <img src={img.node.url} alt="" className="w-full h-full object-cover" />
-                  </button>
-                ))}
-              </div>
+          <div className="aspect-square rounded-3xl overflow-hidden bg-secondary/40 border border-border">
+            {product.image_url && (
+              <img
+                src={product.image_url}
+                alt={product.name}
+                className="w-full h-full object-cover"
+              />
             )}
           </div>
           <div>
             <h1 className="font-display text-4xl md:text-5xl text-primary leading-tight">
-              {product.title}
+              {product.name}
             </h1>
             <p className="mt-4 text-2xl font-semibold text-foreground">
-              ${parseFloat(variant?.price.amount || product.priceRange.minVariantPrice.amount).toFixed(2)}
+              {formatCents(product.price_cents)}
             </p>
             <p className="mt-6 text-muted-foreground leading-relaxed whitespace-pre-line">
               {product.description}
             </p>
-
-            {product.variants.edges.length > 1 && (
-              <div className="mt-8">
-                <div className="text-xs uppercase tracking-widest text-muted-foreground mb-3">
-                  Options
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {product.variants.edges.map((v, i) => (
-                    <button
-                      key={v.node.id}
-                      onClick={() => setVariantIdx(i)}
-                      className={`px-4 py-2 rounded-full text-sm border ${
-                        i === variantIdx
-                          ? "border-primary bg-primary text-primary-foreground"
-                          : "border-border bg-background hover:bg-accent/30"
-                      }`}
-                    >
-                      {v.node.title}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
 
             <div className="mt-8 flex items-center gap-4">
               <div className="inline-flex items-center border border-border rounded-full">
@@ -188,19 +143,8 @@ function ProductPage() {
                   <Plus size={14} />
                 </Button>
               </div>
-              <Button
-                onClick={handleAdd}
-                disabled={isAdding || !variant || !variant.availableForSale}
-                className="flex-1 rounded-full"
-                size="lg"
-              >
-                {isAdding ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : !variant?.availableForSale ? (
-                  "Sold out"
-                ) : (
-                  "Add to cart"
-                )}
+              <Button onClick={handleAdd} className="flex-1 rounded-full" size="lg">
+                Add to cart
               </Button>
             </div>
           </div>
