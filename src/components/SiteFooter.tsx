@@ -13,7 +13,7 @@ export function SiteFooter() {
           </p>
           <div className="mt-5 flex items-center gap-2">
             <a
-              href="https://www.facebook.com/share/14mHiHFZgjL/?mibextid=wwXIfr"
+              href="https://www.facebook.com/people/Happy-2-Help-Counseling/61590639628174/"
               target="_blank"
               rel="noreferrer"
               aria-label="Happy 2 Help Counseling on Facebook"
