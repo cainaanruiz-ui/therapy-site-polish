@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/SiteLayout";
 import { ArrowRight, Heart, Shield, Sparkles } from "lucide-react";
 import logo from "@/assets/logo.png";
+import { SocialFeed } from "@/components/SocialFeed";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -68,6 +69,8 @@ function Index() {
           ))}
         </div>
       </section>
+
+      <SocialFeed />
 
       {/* CTA */}
       <section className="mx-auto max-w-6xl px-5 sm:px-8 py-24 text-center">
