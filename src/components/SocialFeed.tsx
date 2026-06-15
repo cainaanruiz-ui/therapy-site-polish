@@ -1,10 +1,9 @@
 import { useEffect } from "react";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Facebook } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const FACEBOOK_URL = "https://www.facebook.com/people/Happy-2-Help-Counseling/61590639628174/";
 const TIKTOK_URL = "https://www.tiktok.com/@happy2help59";
-const FACEBOOK_EMBED_URL = `https://www.facebook.com/plugins/page.php?href=${encodeURIComponent(FACEBOOK_URL)}&tabs=timeline&width=500&height=620&small_header=true&adapt_container_width=true&hide_cover=false&show_facepile=false`;
 
 export function SocialFeed() {
   useEffect(() => {
@@ -72,15 +71,28 @@ export function SocialFeed() {
               <div className="mb-3 px-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                 Latest on Facebook
               </div>
-              <iframe
-                title="Happy 2 Help Counseling Facebook posts"
-                src={FACEBOOK_EMBED_URL}
-                width="500"
-                height="620"
-                className="mx-auto block w-full max-w-lg border-0"
-                allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-                loading="lazy"
-              />
+              <a
+                href={FACEBOOK_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="group relative flex h-[620px] flex-col items-center justify-center gap-6 overflow-hidden rounded-2xl bg-gradient-to-br from-[#1877F2]/10 via-[#1877F2]/5 to-background p-8 text-center transition-all hover:from-[#1877F2]/20 hover:via-[#1877F2]/10 hover:shadow-md"
+              >
+                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[#1877F2] text-white shadow-lg transition-transform group-hover:scale-110">
+                  <Facebook size={36} />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="font-display text-2xl font-semibold text-foreground">
+                    Happy 2 Help Counseling
+                  </h3>
+                  <p className="max-w-[16rem] text-sm leading-relaxed text-muted-foreground">
+                    Community updates, mental wellness tips, and encouragement for your journey.
+                  </p>
+                </div>
+                <div className="inline-flex items-center gap-2 rounded-full border border-[#1877F2]/30 bg-[#1877F2]/10 px-5 py-2.5 text-sm font-medium text-[#1877F2] transition-colors group-hover:bg-[#1877F2] group-hover:text-white">
+                  Visit our page <ArrowUpRight size={16} />
+                </div>
+                <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-[#1877F2]/0 via-[#1877F2] to-[#1877F2]/0 opacity-0 transition-opacity group-hover:opacity-100" />
+              </a>
             </div>
           </div>
         </div>
