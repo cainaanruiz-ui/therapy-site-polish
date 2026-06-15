@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Mail, Phone, MapPin } from "lucide-react";
+import { Facebook, Mail, MapPin, Music2, Phone } from "lucide-react";
 import logo from "@/assets/logo.png";
 
 export function SiteFooter() {
@@ -11,6 +11,26 @@ export function SiteFooter() {
           <p className="mt-3 text-sm text-muted-foreground max-w-sm">
             Accessible, personalized mental health support in Atlanta, GA. In-person and virtual sessions.
           </p>
+          <div className="mt-5 flex items-center gap-2">
+            <a
+              href="https://www.facebook.com/share/14mHiHFZgjL/?mibextid=wwXIfr"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Happy 2 Help Counseling on Facebook"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
+            >
+              <Facebook size={17} />
+            </a>
+            <a
+              href="https://www.tiktok.com/@happy2help59"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Happy 2 Help Counseling on TikTok"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
+            >
+              <Music2 size={17} />
+            </a>
+          </div>
         </div>
         <div>
           <div className="text-xs uppercase tracking-widest text-muted-foreground mb-3">Explore</div>
