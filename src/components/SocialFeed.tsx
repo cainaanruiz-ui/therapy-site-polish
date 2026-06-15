@@ -50,11 +50,10 @@ export function SocialFeed() {
 
           <div className="min-w-0 overflow-hidden rounded-3xl border border-border bg-background p-3 shadow-sm sm:p-6">
             <blockquote
-              className="tiktok-embed mx-auto"
+              className="tiktok-embed mx-auto min-w-72 max-w-3xl"
               cite={TIKTOK_URL}
               data-unique-id="happy2help59"
               data-embed-type="creator"
-              style={{ maxWidth: "780px", minWidth: "288px" }}
             >
               <section>
                 <a href={TIKTOK_URL} target="_blank" rel="noreferrer">
