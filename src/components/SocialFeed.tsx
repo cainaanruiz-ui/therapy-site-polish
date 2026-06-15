@@ -2,8 +2,9 @@ import { useEffect } from "react";
 import { ArrowUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-const FACEBOOK_URL = "https://www.facebook.com/share/14mHiHFZgjL/?mibextid=wwXIfr";
+const FACEBOOK_URL = "https://www.facebook.com/people/Happy-2-Help-Counseling/61590639628174/";
 const TIKTOK_URL = "https://www.tiktok.com/@happy2help59";
+const FACEBOOK_EMBED_URL = `https://www.facebook.com/plugins/page.php?href=${encodeURIComponent(FACEBOOK_URL)}&tabs=timeline&width=500&height=620&small_header=true&adapt_container_width=true&hide_cover=false&show_facepile=false`;
 
 export function SocialFeed() {
   useEffect(() => {
@@ -48,19 +49,39 @@ export function SocialFeed() {
             </div>
           </div>
 
-          <div className="min-w-0 overflow-hidden rounded-3xl border border-border bg-background p-3 shadow-sm sm:p-6">
-            <blockquote
-              className="tiktok-embed mx-auto min-w-72 max-w-3xl"
-              cite={TIKTOK_URL}
-              data-unique-id="happy2help59"
-              data-embed-type="creator"
-            >
-              <section>
-                <a href={TIKTOK_URL} target="_blank" rel="noreferrer">
-                  @happy2help59 on TikTok
-                </a>
-              </section>
-            </blockquote>
+          <div className="grid min-w-0 gap-6 sm:grid-cols-2">
+            <div className="min-w-0 overflow-hidden rounded-3xl border border-border bg-background p-3 shadow-sm">
+              <div className="mb-3 px-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                Latest on TikTok
+              </div>
+              <blockquote
+                className="tiktok-embed mx-auto min-w-72 max-w-3xl"
+                cite={TIKTOK_URL}
+                data-unique-id="happy2help59"
+                data-embed-type="creator"
+              >
+                <section>
+                  <a href={TIKTOK_URL} target="_blank" rel="noreferrer">
+                    @happy2help59 on TikTok
+                  </a>
+                </section>
+              </blockquote>
+            </div>
+
+            <div className="min-w-0 overflow-hidden rounded-3xl border border-border bg-background p-3 shadow-sm">
+              <div className="mb-3 px-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                Latest on Facebook
+              </div>
+              <iframe
+                title="Happy 2 Help Counseling Facebook posts"
+                src={FACEBOOK_EMBED_URL}
+                width="500"
+                height="620"
+                className="mx-auto block w-full max-w-lg border-0"
+                allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+                loading="lazy"
+              />
+            </div>
           </div>
         </div>
       </div>
