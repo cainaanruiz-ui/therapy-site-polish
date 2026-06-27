@@ -42,7 +42,7 @@ const TEAM = [
     bio: [
       "I am a compassionate and dedicated Licensed Social Worker at Happy 2 Help Counseling, committed to supporting individuals on their journey toward healing and well-being. With advanced training in evidence-based therapies, I specialize in treating trauma, including Post-Traumatic Stress Disorder (PTSD), as well as anxiety and depression.",
       "I believe in a client-centered, empathetic, and collaborative approach to therapy. By integrating Cognitive Behavioral Therapy (CBT), Exposure Therapy, Dialectical Behavior Therapy (DBT), Acceptance and Commitment Therapy (ACT), and Cognitive Processing Therapy (CPT), I tailor interventions to meet the unique needs of each individual.",
-      "Brittany earned both her Bachelor's degree in Social Work and her Master of Social Work (MSW) from the University of Georgia, bringing academic depth and genuine warmth to every session.",
+      "Brittany earned her Master of Social Work (MSW) from the University of Georgia, bringing academic depth and genuine warmth to every session.",
       "Seeking help is a courageous step toward reclaiming your life. Together, we can work toward understanding your experiences, developing coping mechanisms, and building a path to healing. If you're ready to take that first step, I invite you to reach out — you're not alone, and support is available.",
     ],
   },
