@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TeamRouteImport } from './routes/team'
 import { Route as ImmigrationRouteImport } from './routes/immigration'
+import { Route as FaviconDoticoRouteImport } from './routes/favicon[.]ico'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CareersRouteImport } from './routes/careers'
 import { Route as IndexRouteImport } from './routes/index'
@@ -28,6 +29,11 @@ const TeamRoute = TeamRouteImport.update({
 const ImmigrationRoute = ImmigrationRouteImport.update({
   id: '/immigration',
   path: '/immigration',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaviconDoticoRoute = FaviconDoticoRouteImport.update({
+  id: '/favicon.ico',
+  path: '/favicon.ico',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -75,6 +81,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/careers': typeof CareersRoute
   '/contact': typeof ContactRoute
+  '/favicon.ico': typeof FaviconDoticoRoute
   '/immigration': typeof ImmigrationRoute
   '/team': typeof TeamRoute
   '/api/booking': typeof ApiBookingRoute
@@ -87,6 +94,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/careers': typeof CareersRoute
   '/contact': typeof ContactRoute
+  '/favicon.ico': typeof FaviconDoticoRoute
   '/immigration': typeof ImmigrationRoute
   '/team': typeof TeamRoute
   '/api/booking': typeof ApiBookingRoute
@@ -100,6 +108,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/careers': typeof CareersRoute
   '/contact': typeof ContactRoute
+  '/favicon.ico': typeof FaviconDoticoRoute
   '/immigration': typeof ImmigrationRoute
   '/team': typeof TeamRoute
   '/api/booking': typeof ApiBookingRoute
@@ -114,6 +123,7 @@ export interface FileRouteTypes {
     | '/'
     | '/careers'
     | '/contact'
+    | '/favicon.ico'
     | '/immigration'
     | '/team'
     | '/api/booking'
@@ -126,6 +136,7 @@ export interface FileRouteTypes {
     | '/'
     | '/careers'
     | '/contact'
+    | '/favicon.ico'
     | '/immigration'
     | '/team'
     | '/api/booking'
@@ -138,6 +149,7 @@ export interface FileRouteTypes {
     | '/'
     | '/careers'
     | '/contact'
+    | '/favicon.ico'
     | '/immigration'
     | '/team'
     | '/api/booking'
@@ -151,6 +163,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CareersRoute: typeof CareersRoute
   ContactRoute: typeof ContactRoute
+  FaviconDoticoRoute: typeof FaviconDoticoRoute
   ImmigrationRoute: typeof ImmigrationRoute
   TeamRoute: typeof TeamRoute
   ApiBookingRoute: typeof ApiBookingRoute
@@ -174,6 +187,13 @@ declare module '@tanstack/react-router' {
       path: '/immigration'
       fullPath: '/immigration'
       preLoaderRoute: typeof ImmigrationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/favicon.ico': {
+      id: '/favicon.ico'
+      path: '/favicon.ico'
+      fullPath: '/favicon.ico'
+      preLoaderRoute: typeof FaviconDoticoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -239,6 +259,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CareersRoute: CareersRoute,
   ContactRoute: ContactRoute,
+  FaviconDoticoRoute: FaviconDoticoRoute,
   ImmigrationRoute: ImmigrationRoute,
   TeamRoute: TeamRoute,
   ApiBookingRoute: ApiBookingRoute,
