@@ -37,12 +37,13 @@ const TEAM = [
   },
   {
     name: "Brittany Henson, MSW",
-    role: "Therapist · New Therapist Loading…",
+    role: "Licensed Social Worker · LMSW",
     img: brittanyImg,
     bio: [
-      "New therapist loading… please be patient, magic is happening! Brittany is the newest addition to the Happy 2 Help Counseling family, and we couldn't be more excited to welcome her.",
-      "Brittany holds a Master of Social Work (MSW) and brings warmth, humor and a deep heart for helping people feel truly seen. She believes therapy should feel less like a checklist and more like a real conversation — where growth, honesty and a little bit of laughter all have a seat at the table.",
-      "A full bio is on its way soon. In the meantime, know that Brittany is ready to walk alongside you with compassion, curiosity and care.",
+      "I am a compassionate and dedicated Licensed Social Worker at Happy 2 Help Counseling, committed to supporting individuals on their journey toward healing and well-being. With advanced training in evidence-based therapies, I specialize in treating trauma, including Post-Traumatic Stress Disorder (PTSD), as well as anxiety and depression.",
+      "I believe in a client-centered, empathetic, and collaborative approach to therapy. By integrating Cognitive Behavioral Therapy (CBT), Exposure Therapy, Dialectical Behavior Therapy (DBT), Acceptance and Commitment Therapy (ACT), and Cognitive Processing Therapy (CPT), I tailor interventions to meet the unique needs of each individual.",
+      "Brittany holds a Bachelor's degree in Social Work and a Master of Social Work (MSW), bringing both academic depth and lived warmth to every session.",
+      "Seeking help is a courageous step toward reclaiming your life. Together, we can work toward understanding your experiences, developing coping mechanisms, and building a path to healing. If you're ready to take that first step, I invite you to reach out — you're not alone, and support is available.",
     ],
   },
 ];
