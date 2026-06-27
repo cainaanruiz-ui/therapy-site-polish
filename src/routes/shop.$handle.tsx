@@ -1,12 +1,15 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { SiteLayout } from "@/components/SiteLayout";
 import { Button } from "@/components/ui/button";
-import { useCartStore, formatCents } from "@/stores/cartStore";
+import { useCartStore, formatMoney } from "@/stores/cartStore";
 import { Loader2, ArrowLeft, Minus, Plus } from "lucide-react";
-import { getProductBySlug } from "@/lib/products.functions";
+import {
+  PRODUCT_BY_HANDLE_QUERY,
+  storefrontApiRequest,
+  type ShopifyProductNode,
+} from "@/lib/shopify";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/shop/$handle")({
@@ -45,13 +48,19 @@ export const Route = createFileRoute("/shop/$handle")({
 
 function ProductPage() {
   const { handle } = Route.useParams();
-  const fetchProduct = useServerFn(getProductBySlug);
   const { data: product, isLoading } = useQuery({
-    queryKey: ["product", handle],
-    queryFn: () => fetchProduct({ data: { slug: handle } }),
+    queryKey: ["shopify-product", handle],
+    queryFn: async () => {
+      const res = await storefrontApiRequest<{ productByHandle: ShopifyProductNode | null }>(
+        PRODUCT_BY_HANDLE_QUERY,
+        { handle },
+      );
+      return res?.data?.productByHandle ?? null;
+    },
   });
   const [quantity, setQuantity] = useState(1);
   const addItem = useCartStore((s) => s.addItem);
+  const isAdding = useCartStore((s) => s.isLoading);
 
   if (isLoading) {
     return (
@@ -79,18 +88,20 @@ function ProductPage() {
     );
   }
 
-  const handleAdd = () => {
-    addItem(
-      {
-        productId: product.id,
-        slug: product.slug,
-        name: product.name,
-        imageUrl: product.image_url,
-        priceCents: product.price_cents,
-      },
+  const variant = product.variants.edges[0]?.node;
+  const image = product.images.edges[0]?.node;
+
+  const handleAdd = async () => {
+    if (!variant) return;
+    await addItem({
+      product: { node: product },
+      variantId: variant.id,
+      variantTitle: variant.title,
+      price: variant.price,
       quantity,
-    );
-    toast.success(`${product.name} added to cart`);
+      selectedOptions: variant.selectedOptions ?? [],
+    });
+    toast.success(`${product.title} added to cart`);
   };
 
   return (
@@ -104,20 +115,25 @@ function ProductPage() {
         </Link>
         <div className="grid md:grid-cols-2 gap-10 lg:gap-16">
           <div className="aspect-square rounded-3xl overflow-hidden bg-secondary/40 border border-border">
-            {product.image_url && (
+            {image && (
               <img
-                src={product.image_url}
-                alt={product.name}
+                src={image.url}
+                alt={image.altText ?? product.title}
                 className="w-full h-full object-cover"
               />
             )}
           </div>
           <div>
             <h1 className="font-display text-4xl md:text-5xl text-primary leading-tight">
-              {product.name}
+              {product.title}
             </h1>
             <p className="mt-4 text-2xl font-semibold text-foreground">
-              {formatCents(product.price_cents)}
+              {variant
+                ? formatMoney(variant.price.amount, variant.price.currencyCode)
+                : formatMoney(
+                    product.priceRange.minVariantPrice.amount,
+                    product.priceRange.minVariantPrice.currencyCode,
+                  )}
             </p>
             <p className="mt-6 text-muted-foreground leading-relaxed whitespace-pre-line">
               {product.description}
@@ -143,8 +159,13 @@ function ProductPage() {
                   <Plus size={14} />
                 </Button>
               </div>
-              <Button onClick={handleAdd} className="flex-1 rounded-full" size="lg">
-                Add to cart
+              <Button
+                onClick={handleAdd}
+                className="flex-1 rounded-full"
+                size="lg"
+                disabled={isAdding || !variant?.availableForSale}
+              >
+                {variant?.availableForSale === false ? "Sold out" : isAdding ? "Adding…" : "Add to cart"}
               </Button>
             </div>
           </div>
