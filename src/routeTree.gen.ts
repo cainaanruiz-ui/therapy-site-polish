@@ -12,21 +12,13 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as TeamRouteImport } from './routes/team'
 import { Route as ImmigrationRouteImport } from './routes/immigration'
 import { Route as ContactRouteImport } from './routes/contact'
-import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as CareersRouteImport } from './routes/careers'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ShopIndexRouteImport } from './routes/shop.index'
 import { Route as ServicesIndexRouteImport } from './routes/services.index'
 import { Route as ShopHandleRouteImport } from './routes/shop.$handle'
 import { Route as ServicesSlugRouteImport } from './routes/services.$slug'
-import { Route as OrderConfirmationIdRouteImport } from './routes/order-confirmation.$id'
 import { Route as ApiBookingRouteImport } from './routes/api/booking'
-import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
-import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
-import { Route as AuthenticatedAdminProductsRouteImport } from './routes/_authenticated/admin.products'
-import { Route as AuthenticatedAdminOrdersRouteImport } from './routes/_authenticated/admin.orders'
 
 const TeamRoute = TeamRouteImport.update({
   id: '/team',
@@ -43,23 +35,9 @@ const ContactRoute = ContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CheckoutRoute = CheckoutRouteImport.update({
-  id: '/checkout',
-  path: '/checkout',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const CareersRoute = CareersRouteImport.update({
   id: '/careers',
   path: '/careers',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
-  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -87,168 +65,95 @@ const ServicesSlugRoute = ServicesSlugRouteImport.update({
   path: '/services/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
-const OrderConfirmationIdRoute = OrderConfirmationIdRouteImport.update({
-  id: '/order-confirmation/$id',
-  path: '/order-confirmation/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiBookingRoute = ApiBookingRouteImport.update({
   id: '/api/booking',
   path: '/api/booking',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AuthenticatedAdminRoute,
-} as any)
-const AuthenticatedAdminProductsRoute =
-  AuthenticatedAdminProductsRouteImport.update({
-    id: '/products',
-    path: '/products',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
-const AuthenticatedAdminOrdersRoute =
-  AuthenticatedAdminOrdersRouteImport.update({
-    id: '/orders',
-    path: '/orders',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/auth': typeof AuthRoute
   '/careers': typeof CareersRoute
-  '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
   '/immigration': typeof ImmigrationRoute
   '/team': typeof TeamRoute
-  '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/api/booking': typeof ApiBookingRoute
-  '/order-confirmation/$id': typeof OrderConfirmationIdRoute
   '/services/$slug': typeof ServicesSlugRoute
   '/shop/$handle': typeof ShopHandleRoute
   '/services/': typeof ServicesIndexRoute
   '/shop/': typeof ShopIndexRoute
-  '/admin/orders': typeof AuthenticatedAdminOrdersRoute
-  '/admin/products': typeof AuthenticatedAdminProductsRoute
-  '/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/auth': typeof AuthRoute
   '/careers': typeof CareersRoute
-  '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
   '/immigration': typeof ImmigrationRoute
   '/team': typeof TeamRoute
   '/api/booking': typeof ApiBookingRoute
-  '/order-confirmation/$id': typeof OrderConfirmationIdRoute
   '/services/$slug': typeof ServicesSlugRoute
   '/shop/$handle': typeof ShopHandleRoute
   '/services': typeof ServicesIndexRoute
   '/shop': typeof ShopIndexRoute
-  '/admin/orders': typeof AuthenticatedAdminOrdersRoute
-  '/admin/products': typeof AuthenticatedAdminProductsRoute
-  '/admin': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
-  '/auth': typeof AuthRoute
   '/careers': typeof CareersRoute
-  '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
   '/immigration': typeof ImmigrationRoute
   '/team': typeof TeamRoute
-  '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/api/booking': typeof ApiBookingRoute
-  '/order-confirmation/$id': typeof OrderConfirmationIdRoute
   '/services/$slug': typeof ServicesSlugRoute
   '/shop/$handle': typeof ShopHandleRoute
   '/services/': typeof ServicesIndexRoute
   '/shop/': typeof ShopIndexRoute
-  '/_authenticated/admin/orders': typeof AuthenticatedAdminOrdersRoute
-  '/_authenticated/admin/products': typeof AuthenticatedAdminProductsRoute
-  '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/auth'
     | '/careers'
-    | '/checkout'
     | '/contact'
     | '/immigration'
     | '/team'
-    | '/admin'
     | '/api/booking'
-    | '/order-confirmation/$id'
     | '/services/$slug'
     | '/shop/$handle'
     | '/services/'
     | '/shop/'
-    | '/admin/orders'
-    | '/admin/products'
-    | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/auth'
     | '/careers'
-    | '/checkout'
     | '/contact'
     | '/immigration'
     | '/team'
     | '/api/booking'
-    | '/order-confirmation/$id'
     | '/services/$slug'
     | '/shop/$handle'
     | '/services'
     | '/shop'
-    | '/admin/orders'
-    | '/admin/products'
-    | '/admin'
   id:
     | '__root__'
     | '/'
-    | '/_authenticated'
-    | '/auth'
     | '/careers'
-    | '/checkout'
     | '/contact'
     | '/immigration'
     | '/team'
-    | '/_authenticated/admin'
     | '/api/booking'
-    | '/order-confirmation/$id'
     | '/services/$slug'
     | '/shop/$handle'
     | '/services/'
     | '/shop/'
-    | '/_authenticated/admin/orders'
-    | '/_authenticated/admin/products'
-    | '/_authenticated/admin/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
-  AuthRoute: typeof AuthRoute
   CareersRoute: typeof CareersRoute
-  CheckoutRoute: typeof CheckoutRoute
   ContactRoute: typeof ContactRoute
   ImmigrationRoute: typeof ImmigrationRoute
   TeamRoute: typeof TeamRoute
   ApiBookingRoute: typeof ApiBookingRoute
-  OrderConfirmationIdRoute: typeof OrderConfirmationIdRoute
   ServicesSlugRoute: typeof ServicesSlugRoute
   ShopHandleRoute: typeof ShopHandleRoute
   ServicesIndexRoute: typeof ServicesIndexRoute
@@ -278,32 +183,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/checkout': {
-      id: '/checkout'
-      path: '/checkout'
-      fullPath: '/checkout'
-      preLoaderRoute: typeof CheckoutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/careers': {
       id: '/careers'
       path: '/careers'
       fullPath: '/careers'
       preLoaderRoute: typeof CareersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated': {
-      id: '/_authenticated'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -341,13 +225,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ServicesSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/order-confirmation/$id': {
-      id: '/order-confirmation/$id'
-      path: '/order-confirmation/$id'
-      fullPath: '/order-confirmation/$id'
-      preLoaderRoute: typeof OrderConfirmationIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/booking': {
       id: '/api/booking'
       path: '/api/booking'
@@ -355,74 +232,16 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiBookingRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/admin': {
-      id: '/_authenticated/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AuthenticatedAdminRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/admin/': {
-      id: '/_authenticated/admin/'
-      path: '/'
-      fullPath: '/admin/'
-      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/products': {
-      id: '/_authenticated/admin/products'
-      path: '/products'
-      fullPath: '/admin/products'
-      preLoaderRoute: typeof AuthenticatedAdminProductsRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/orders': {
-      id: '/_authenticated/admin/orders'
-      path: '/orders'
-      fullPath: '/admin/orders'
-      preLoaderRoute: typeof AuthenticatedAdminOrdersRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
   }
 }
 
-interface AuthenticatedAdminRouteChildren {
-  AuthenticatedAdminOrdersRoute: typeof AuthenticatedAdminOrdersRoute
-  AuthenticatedAdminProductsRoute: typeof AuthenticatedAdminProductsRoute
-  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
-}
-
-const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
-  AuthenticatedAdminOrdersRoute: AuthenticatedAdminOrdersRoute,
-  AuthenticatedAdminProductsRoute: AuthenticatedAdminProductsRoute,
-  AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
-}
-
-const AuthenticatedAdminRouteWithChildren =
-  AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
-
-interface AuthenticatedRouteRouteChildren {
-  AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
-}
-
-const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
-}
-
-const AuthenticatedRouteRouteWithChildren =
-  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
-  AuthRoute: AuthRoute,
   CareersRoute: CareersRoute,
-  CheckoutRoute: CheckoutRoute,
   ContactRoute: ContactRoute,
   ImmigrationRoute: ImmigrationRoute,
   TeamRoute: TeamRoute,
   ApiBookingRoute: ApiBookingRoute,
-  OrderConfirmationIdRoute: OrderConfirmationIdRoute,
   ServicesSlugRoute: ServicesSlugRoute,
   ShopHandleRoute: ShopHandleRoute,
   ServicesIndexRoute: ServicesIndexRoute,
@@ -431,13 +250,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

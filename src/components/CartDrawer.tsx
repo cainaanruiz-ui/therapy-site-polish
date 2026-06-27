@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -10,21 +9,35 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { ShoppingCart, Minus, Plus, Trash2 } from "lucide-react";
-import { useCartStore, formatCents } from "@/stores/cartStore";
+import { ShoppingCart, Minus, Plus, Trash2, Loader2, ExternalLink } from "lucide-react";
+import { useCartStore, formatMoney } from "@/stores/cartStore";
 
 export function CartDrawer() {
   const [isOpen, setIsOpen] = useState(false);
-  const navigate = useNavigate();
   const items = useCartStore((s) => s.items);
   const updateQuantity = useCartStore((s) => s.updateQuantity);
   const removeItem = useCartStore((s) => s.removeItem);
+  const isLoading = useCartStore((s) => s.isLoading);
+  const isSyncing = useCartStore((s) => s.isSyncing);
+  const syncCart = useCartStore((s) => s.syncCart);
+  const getCheckoutUrl = useCartStore((s) => s.getCheckoutUrl);
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-  const subtotalCents = items.reduce((sum, item) => sum + item.priceCents * item.quantity, 0);
+  const subtotal = items.reduce(
+    (sum, item) => sum + parseFloat(item.price.amount) * item.quantity,
+    0,
+  );
+  const currency = items[0]?.price.currencyCode ?? "USD";
+
+  useEffect(() => {
+    if (isOpen) syncCart();
+  }, [isOpen, syncCart]);
 
   const handleCheckout = () => {
-    setIsOpen(false);
-    navigate({ to: "/checkout" });
+    const url = getCheckoutUrl();
+    if (url) {
+      window.open(url, "_blank");
+      setIsOpen(false);
+    }
   };
 
   return (
@@ -61,22 +74,27 @@ export function CartDrawer() {
               <div className="flex-1 overflow-y-auto pr-2 min-h-0">
                 <div className="space-y-4">
                   {items.map((item) => (
-                    <div key={item.productId} className="flex gap-4 p-2">
+                    <div key={item.variantId} className="flex gap-4 p-2">
                       <div className="w-16 h-16 bg-secondary/40 rounded-md overflow-hidden flex-shrink-0">
-                        {item.imageUrl && (
+                        {item.product.node.images?.edges?.[0]?.node && (
                           <img
-                            src={item.imageUrl}
-                            alt={item.name}
+                            src={item.product.node.images.edges[0].node.url}
+                            alt={item.product.node.title}
                             className="w-full h-full object-cover"
                           />
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
                         <h4 className="font-medium truncate text-foreground">
-                          {item.name}
+                          {item.product.node.title}
                         </h4>
+                        {item.selectedOptions?.length > 0 && item.variantTitle !== "Default Title" && (
+                          <p className="text-xs text-muted-foreground">
+                            {item.selectedOptions.map((o) => o.value).join(" • ")}
+                          </p>
+                        )}
                         <p className="font-semibold text-primary">
-                          {formatCents(item.priceCents)}
+                          {formatMoney(item.price.amount, item.price.currencyCode)}
                         </p>
                       </div>
                       <div className="flex flex-col items-end gap-2 flex-shrink-0">
@@ -84,7 +102,7 @@ export function CartDrawer() {
                           variant="ghost"
                           size="icon"
                           className="h-6 w-6"
-                          onClick={() => removeItem(item.productId)}
+                          onClick={() => removeItem(item.variantId)}
                         >
                           <Trash2 className="h-3 w-3" />
                         </Button>
@@ -93,7 +111,7 @@ export function CartDrawer() {
                             variant="outline"
                             size="icon"
                             className="h-6 w-6"
-                            onClick={() => updateQuantity(item.productId, item.quantity - 1)}
+                            onClick={() => updateQuantity(item.variantId, item.quantity - 1)}
                           >
                             <Minus className="h-3 w-3" />
                           </Button>
@@ -102,7 +120,7 @@ export function CartDrawer() {
                             variant="outline"
                             size="icon"
                             className="h-6 w-6"
-                            onClick={() => updateQuantity(item.productId, item.quantity + 1)}
+                            onClick={() => updateQuantity(item.variantId, item.quantity + 1)}
                           >
                             <Plus className="h-3 w-3" />
                           </Button>
@@ -116,16 +134,23 @@ export function CartDrawer() {
                 <div className="flex justify-between items-center">
                   <span className="text-lg font-semibold text-foreground">Subtotal</span>
                   <span className="text-xl font-bold text-primary">
-                    {formatCents(subtotalCents)}
+                    {formatMoney(subtotal, currency)}
                   </span>
                 </div>
                 <Button
                   onClick={handleCheckout}
                   className="w-full rounded-full"
                   size="lg"
-                  disabled={items.length === 0}
+                  disabled={items.length === 0 || isLoading || isSyncing}
                 >
-                  Checkout
+                  {isLoading || isSyncing ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <>
+                      <ExternalLink className="w-4 h-4 mr-2" />
+                      Checkout
+                    </>
+                  )}
                 </Button>
               </div>
             </>

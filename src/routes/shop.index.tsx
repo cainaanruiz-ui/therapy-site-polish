@@ -1,11 +1,10 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { SiteLayout } from "@/components/SiteLayout";
 import { Button } from "@/components/ui/button";
-import { useCartStore, formatCents } from "@/stores/cartStore";
+import { useCartStore, formatMoney } from "@/stores/cartStore";
 import { Loader2, ShoppingBag } from "lucide-react";
-import { listProducts } from "@/lib/products.functions";
+import { PRODUCTS_QUERY, storefrontApiRequest, type ShopifyProduct } from "@/lib/shopify";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/shop/")({
@@ -51,22 +50,16 @@ export const Route = createFileRoute("/shop/")({
   ),
 });
 
-type Product = {
-  id: string;
-  name: string;
-  slug: string;
-  description: string | null;
-  price_cents: number;
-  image_url: string | null;
-  inventory: number;
-  active: boolean;
-};
-
 function ShopPage() {
-  const fetchProducts = useServerFn(listProducts);
   const { data: products, isLoading, error } = useQuery({
-    queryKey: ["products"],
-    queryFn: () => fetchProducts(),
+    queryKey: ["shopify-products"],
+    queryFn: async () => {
+      const res = await storefrontApiRequest<{ products: { edges: ShopifyProduct[] } }>(
+        PRODUCTS_QUERY,
+        { first: 50 },
+      );
+      return res?.data?.products?.edges ?? [];
+    },
   });
 
   return (
@@ -102,7 +95,7 @@ function ShopPage() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {products.map((p) => (
-              <ProductCard key={p.id} product={p as Product} />
+              <ProductCard key={p.node.id} product={p} />
             ))}
           </div>
         )}
@@ -111,31 +104,37 @@ function ShopPage() {
   );
 }
 
-function ProductCard({ product }: { product: Product }) {
+function ProductCard({ product }: { product: ShopifyProduct }) {
   const addItem = useCartStore((s) => s.addItem);
+  const isLoading = useCartStore((s) => s.isLoading);
+  const node = product.node;
+  const variant = node.variants.edges[0]?.node;
+  const image = node.images.edges[0]?.node;
 
-  const handleAdd = () => {
-    addItem({
-      productId: product.id,
-      slug: product.slug,
-      name: product.name,
-      imageUrl: product.image_url,
-      priceCents: product.price_cents,
+  const handleAdd = async () => {
+    if (!variant) return;
+    await addItem({
+      product,
+      variantId: variant.id,
+      variantTitle: variant.title,
+      price: variant.price,
+      quantity: 1,
+      selectedOptions: variant.selectedOptions ?? [],
     });
-    toast.success(`${product.name} added to cart`);
+    toast.success(`${node.title} added to cart`);
   };
 
   return (
     <div className="group rounded-3xl bg-card border border-border overflow-hidden flex flex-col">
       <Link
         to="/shop/$handle"
-        params={{ handle: product.slug }}
+        params={{ handle: node.handle }}
         className="block aspect-square bg-secondary/40 overflow-hidden"
       >
-        {product.image_url ? (
+        {image ? (
           <img
-            src={product.image_url}
-            alt={product.name}
+            src={image.url}
+            alt={image.altText ?? node.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
         ) : (
@@ -147,20 +146,23 @@ function ProductCard({ product }: { product: Product }) {
       <div className="p-6 flex flex-col flex-1">
         <Link
           to="/shop/$handle"
-          params={{ handle: product.slug }}
+          params={{ handle: node.handle }}
           className="font-display text-xl text-primary hover:underline"
         >
-          {product.name}
+          {node.title}
         </Link>
         <p className="mt-2 text-sm text-muted-foreground line-clamp-2 flex-1">
-          {product.description}
+          {node.description}
         </p>
         <div className="mt-4 flex items-center justify-between gap-3">
           <span className="text-lg font-semibold text-foreground">
-            {formatCents(product.price_cents)}
+            {formatMoney(
+              node.priceRange.minVariantPrice.amount,
+              node.priceRange.minVariantPrice.currencyCode,
+            )}
           </span>
-          <Button onClick={handleAdd} className="rounded-full" size="sm">
-            Add to cart
+          <Button onClick={handleAdd} className="rounded-full" size="sm" disabled={isLoading || !variant?.availableForSale}>
+            {variant?.availableForSale === false ? "Sold out" : "Add to cart"}
           </Button>
         </div>
       </div>
