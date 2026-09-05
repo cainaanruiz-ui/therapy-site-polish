@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -19,11 +19,14 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   listTherapists,
   listServiceTypes,
   listSessions,
   upsertSession,
+  upsertTherapist,
+  upsertServiceType,
   updateSessionStatus,
   deleteSession,
   type Session,
@@ -32,8 +35,9 @@ import {
 } from "@/lib/billing.functions";
 import { useServerFn } from "@tanstack/react-start";
 import { formatMoney } from "@/stores/cartStore";
-import { Plus, Trash2, CheckCircle2, CircleDollarSign } from "lucide-react";
+import { Plus, Trash2, CheckCircle2, CircleDollarSign, LogOut } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/admin/billing")({
   component: BillingPage,
@@ -47,8 +51,9 @@ export const Route = createFileRoute("/_authenticated/admin/billing")({
 
 function BillingPage() {
   const queryClient = useQueryClient();
-  const [open, setOpen] = useState(false);
-  const [editing, setEditing] = useState<Session | null>(null);
+  const navigate = useNavigate();
+  const [sessionOpen, setSessionOpen] = useState(false);
+  const [editingSession, setEditingSession] = useState<Session | null>(null);
 
   const fetchTherapists = useServerFn(listTherapists);
   const fetchServiceTypes = useServerFn(listServiceTypes);
@@ -74,8 +79,8 @@ function BillingPage() {
     mutationFn: saveSession,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["sessions"] });
-      setOpen(false);
-      setEditing(null);
+      setSessionOpen(false);
+      setEditingSession(null);
       toast.success("Session saved");
     },
     onError: (err: Error) => toast.error(err.message),
@@ -93,6 +98,11 @@ function BillingPage() {
     onError: (err: Error) => toast.error(err.message),
   });
 
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    navigate({ to: "/auth" });
+  };
+
   const totals = therapists.map((t) => {
     const therapistSessions = sessions.filter((s) => s.therapist_id === t.id);
     const billed = therapistSessions.reduce((sum, s) => sum + s.billed_cents, 0);
@@ -106,35 +116,37 @@ function BillingPage() {
         <div>
           <h1 className="font-display text-4xl text-primary">Billing</h1>
           <p className="mt-1 text-muted-foreground">
-            Log sessions, track billed amounts, and calculate therapist payouts.
+            Log sessions, set therapist rates, and calculate payouts automatically.
           </p>
         </div>
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button
-              className="rounded-full"
-              onClick={() => setEditing(null)}
-            >
-              <Plus className="w-4 h-4 mr-2" /> Log Session
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-lg">
-            <DialogHeader>
-              <DialogTitle>{editing ? "Edit Session" : "Log Session"}</DialogTitle>
-            </DialogHeader>
-            <SessionForm
-              therapists={therapists}
-              serviceTypes={serviceTypes}
-              initial={editing}
-              onSubmit={(data) =>
-                saveMutation.mutate({
-                  data: { ...data, id: editing?.id },
-                })
-              }
-              loading={saveMutation.isPending}
-            />
-          </DialogContent>
-        </Dialog>
+        <div className="flex items-center gap-2">
+          <Dialog open={sessionOpen} onOpenChange={setSessionOpen}>
+            <DialogTrigger asChild>
+              <Button className="rounded-full" onClick={() => setEditingSession(null)}>
+                <Plus className="w-4 h-4 mr-2" /> Log Session
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-lg">
+              <DialogHeader>
+                <DialogTitle>{editingSession ? "Edit Session" : "Log Session"}</DialogTitle>
+              </DialogHeader>
+              <SessionForm
+                therapists={therapists}
+                serviceTypes={serviceTypes}
+                initial={editingSession}
+                onSubmit={(data) =>
+                  saveMutation.mutate({
+                    data: { ...data, id: editingSession?.id },
+                  })
+                }
+                loading={saveMutation.isPending}
+              />
+            </DialogContent>
+          </Dialog>
+          <Button variant="outline" size="icon" onClick={handleSignOut} title="Sign out">
+            <LogOut className="w-4 h-4" />
+          </Button>
+        </div>
       </div>
 
       <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -160,100 +172,457 @@ function BillingPage() {
         ))}
       </div>
 
-      <div className="mt-10 rounded-2xl border border-border bg-card overflow-hidden">
+      <Tabs defaultValue="sessions" className="mt-10">
+        <TabsList className="rounded-full bg-secondary/50 p-1">
+          <TabsTrigger value="sessions" className="rounded-full px-4">Sessions</TabsTrigger>
+          <TabsTrigger value="therapists" className="rounded-full px-4">Therapists</TabsTrigger>
+          <TabsTrigger value="services" className="rounded-full px-4">Service Types</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="sessions" className="mt-6">
+          <div className="rounded-2xl border border-border bg-card overflow-hidden">
+            <table className="w-full text-sm">
+              <thead className="bg-secondary/50 text-left">
+                <tr>
+                  <th className="px-4 py-3 font-medium">Date</th>
+                  <th className="px-4 py-3 font-medium">Therapist</th>
+                  <th className="px-4 py-3 font-medium">Client</th>
+                  <th className="px-4 py-3 font-medium">Service</th>
+                  <th className="px-4 py-3 font-medium text-right">Billed</th>
+                  <th className="px-4 py-3 font-medium text-right">Payout</th>
+                  <th className="px-4 py-3 font-medium">Status</th>
+                  <th className="px-4 py-3 font-medium text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {sessions.map((s) => (
+                  <tr key={s.id} className="hover:bg-secondary/20">
+                    <td className="px-4 py-3 whitespace-nowrap">{s.session_date}</td>
+                    <td className="px-4 py-3">{s.therapist?.name}</td>
+                    <td className="px-4 py-3">
+                      {s.client_name}
+                      {s.client_insurance && (
+                        <span className="block text-xs text-muted-foreground">{s.client_insurance}</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3">
+                      {s.is_intake ? "Intake" : "Session"}
+                      {s.service_type?.name && (
+                        <span className="block text-xs text-muted-foreground">{s.service_type.name}</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-right">{formatMoney((s.billed_cents / 100).toFixed(2))}</td>
+                    <td className="px-4 py-3 text-right text-accent">
+                      {formatMoney((s.therapist_split_cents / 100).toFixed(2))}
+                    </td>
+                    <td className="px-4 py-3">
+                      <Badge
+                        variant={s.status === "paid" ? "default" : s.status === "submitted" ? "secondary" : "outline"}
+                      >
+                        {s.status}
+                      </Badge>
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        {s.status !== "paid" && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            title="Mark paid"
+                            onClick={() => statusMutation.mutate({ data: { id: s.id, status: "paid" } })}
+                          >
+                            <CircleDollarSign className="w-4 h-4" />
+                          </Button>
+                        )}
+                        {s.status === "paid" && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            title="Mark logged"
+                            onClick={() => statusMutation.mutate({ data: { id: s.id, status: "logged" } })}
+                          >
+                            <CheckCircle2 className="w-4 h-4" />
+                          </Button>
+                        )}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          title="Edit"
+                          onClick={() => {
+                            setEditingSession(s);
+                            setSessionOpen(true);
+                          }}
+                        >
+                          <Plus className="w-4 h-4 rotate-45" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          title="Delete"
+                          onClick={() => deleteMutation.mutate({ data: { id: s.id } })}
+                        >
+                          <Trash2 className="w-4 h-4 text-destructive" />
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+                {sessions.length === 0 && (
+                  <tr>
+                    <td colSpan={8} className="px-4 py-10 text-center text-muted-foreground">
+                      No sessions logged yet. Click "Log Session" to add one.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="therapists" className="mt-6">
+          <TherapistsTab therapists={therapists} />
+        </TabsContent>
+
+        <TabsContent value="services" className="mt-6">
+          <ServiceTypesTab therapists={therapists} serviceTypes={serviceTypes} />
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}
+
+function TherapistsTab({ therapists }: { therapists: Therapist[] }) {
+  const queryClient = useQueryClient();
+  const saveTherapist = useServerFn(upsertTherapist);
+  const [open, setOpen] = useState(false);
+  const [editing, setEditing] = useState<Therapist | null>(null);
+  const [form, setForm] = useState({ name: "", email: "", split_percent: 55, active: true });
+
+  const mutation = useMutation({
+    mutationFn: saveTherapist,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["therapists"] });
+      setOpen(false);
+      setEditing(null);
+      toast.success("Therapist saved");
+    },
+    onError: (err: Error) => toast.error(err.message),
+  });
+
+  const startEdit = (t: Therapist) => {
+    setEditing(t);
+    setForm({ name: t.name, email: t.email ?? "", split_percent: t.split_percent, active: t.active });
+    setOpen(true);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    mutation.mutate({
+      data: {
+        id: editing?.id,
+        name: form.name,
+        email: form.email || null,
+        split_percent: Number(form.split_percent),
+        active: form.active,
+      },
+    });
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex justify-end">
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <Button
+              className="rounded-full"
+              onClick={() => {
+                setEditing(null);
+                setForm({ name: "", email: "", split_percent: 55, active: true });
+              }}
+            >
+              <Plus className="w-4 h-4 mr-2" /> Add Therapist
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>{editing ? "Edit Therapist" : "Add Therapist"}</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleSubmit} className="space-y-4 mt-2">
+              <div className="space-y-2">
+                <Label>Name</Label>
+                <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
+              </div>
+              <div className="space-y-2">
+                <Label>Email</Label>
+                <Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+              </div>
+              <div className="space-y-2">
+                <Label>Split %</Label>
+                <Input
+                  type="number"
+                  step={0.01}
+                  min={0}
+                  max={100}
+                  value={form.split_percent}
+                  onChange={(e) => setForm({ ...form, split_percent: Number(e.target.value) })}
+                  required
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <input
+                  id="t-active"
+                  type="checkbox"
+                  checked={form.active}
+                  onChange={(e) => setForm({ ...form, active: e.target.checked })}
+                  className="h-4 w-4 rounded border-border"
+                />
+                <Label htmlFor="t-active" className="font-normal">Active</Label>
+              </div>
+              <Button type="submit" className="w-full rounded-full" disabled={mutation.isPending}>
+                {mutation.isPending ? "Saving…" : "Save Therapist"}
+              </Button>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      <div className="rounded-2xl border border-border bg-card overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-secondary/50 text-left">
             <tr>
-              <th className="px-4 py-3 font-medium">Date</th>
-              <th className="px-4 py-3 font-medium">Therapist</th>
-              <th className="px-4 py-3 font-medium">Client</th>
-              <th className="px-4 py-3 font-medium">Service</th>
-              <th className="px-4 py-3 font-medium text-right">Billed</th>
-              <th className="px-4 py-3 font-medium text-right">Payout (55%)</th>
+              <th className="px-4 py-3 font-medium">Name</th>
+              <th className="px-4 py-3 font-medium">Email</th>
+              <th className="px-4 py-3 font-medium">Split %</th>
               <th className="px-4 py-3 font-medium">Status</th>
               <th className="px-4 py-3 font-medium text-right">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {sessions.map((s) => (
-              <tr key={s.id} className="hover:bg-secondary/20">
-                <td className="px-4 py-3 whitespace-nowrap">{s.session_date}</td>
-                <td className="px-4 py-3">{s.therapist?.name}</td>
+            {therapists.map((t) => (
+              <tr key={t.id} className="hover:bg-secondary/20">
+                <td className="px-4 py-3 font-medium">{t.name}</td>
+                <td className="px-4 py-3 text-muted-foreground">{t.email || "—"}</td>
+                <td className="px-4 py-3">{t.split_percent}%</td>
                 <td className="px-4 py-3">
-                  {s.client_name}
-                  {s.client_insurance && (
-                    <span className="block text-xs text-muted-foreground">{s.client_insurance}</span>
-                  )}
-                </td>
-                <td className="px-4 py-3">
-                  {s.is_intake ? "Intake" : "Session"}
-                  {s.service_type?.name && (
-                    <span className="block text-xs text-muted-foreground">{s.service_type.name}</span>
-                  )}
-                </td>
-                <td className="px-4 py-3 text-right">{formatMoney((s.billed_cents / 100).toFixed(2))}</td>
-                <td className="px-4 py-3 text-right text-accent">
-                  {formatMoney((s.therapist_split_cents / 100).toFixed(2))}
-                </td>
-                <td className="px-4 py-3">
-                  <Badge
-                    variant={s.status === "paid" ? "default" : s.status === "submitted" ? "secondary" : "outline"}
-                  >
-                    {s.status}
-                  </Badge>
+                  <Badge variant={t.active ? "default" : "secondary"}>{t.active ? "Active" : "Inactive"}</Badge>
                 </td>
                 <td className="px-4 py-3 text-right">
-                  <div className="flex items-center justify-end gap-2">
-                    {s.status !== "paid" && (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        title="Mark paid"
-                        onClick={() => statusMutation.mutate({ data: { id: s.id, status: "paid" } })}
-                      >
-                        <CircleDollarSign className="w-4 h-4" />
-                      </Button>
-                    )}
-                    {s.status === "paid" && (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        title="Mark logged"
-                        onClick={() => statusMutation.mutate({ data: { id: s.id, status: "logged" } })}
-                      >
-                        <CheckCircle2 className="w-4 h-4" />
-                      </Button>
-                    )}
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      title="Edit"
-                      onClick={() => {
-                        setEditing(s);
-                        setOpen(true);
-                      }}
-                    >
-                      <Plus className="w-4 h-4 rotate-45" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      title="Delete"
-                      onClick={() => deleteMutation.mutate({ data: { id: s.id } })}
-                    >
-                      <Trash2 className="w-4 h-4 text-destructive" />
-                    </Button>
-                  </div>
+                  <Button variant="ghost" size="icon" title="Edit" onClick={() => startEdit(t)}>
+                    <Plus className="w-4 h-4 rotate-45" />
+                  </Button>
                 </td>
               </tr>
             ))}
-            {sessions.length === 0 && (
-              <tr>
-                <td colSpan={8} className="px-4 py-10 text-center text-muted-foreground">
-                  No sessions logged yet. Click "Log Session" to add one.
-                </td>
-              </tr>
-            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+function ServiceTypesTab({ therapists, serviceTypes }: { therapists: Therapist[]; serviceTypes: ServiceType[] }) {
+  const queryClient = useQueryClient();
+  const saveService = useServerFn(upsertServiceType);
+  const [open, setOpen] = useState(false);
+  const [editing, setEditing] = useState<ServiceType | null>(null);
+  const [form, setForm] = useState({
+    therapist_id: therapists[0]?.id ?? "",
+    name: "",
+    intake_cents: "",
+    session_cents: "",
+    duration_minutes: "",
+    insurance_payer: "",
+    notes: "",
+    active: true,
+  });
+
+  const mutation = useMutation({
+    mutationFn: saveService,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["service-types"] });
+      setOpen(false);
+      setEditing(null);
+      toast.success("Service type saved");
+    },
+    onError: (err: Error) => toast.error(err.message),
+  });
+
+  const startEdit = (st: ServiceType) => {
+    setEditing(st);
+    setForm({
+      therapist_id: st.therapist_id,
+      name: st.name,
+      intake_cents: (st.intake_cents / 100).toFixed(2),
+      session_cents: (st.session_cents / 100).toFixed(2),
+      duration_minutes: st.duration_minutes?.toString() ?? "",
+      insurance_payer: st.insurance_payer ?? "",
+      notes: st.notes ?? "",
+      active: st.active,
+    });
+    setOpen(true);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    mutation.mutate({
+      data: {
+        id: editing?.id,
+        therapist_id: form.therapist_id,
+        name: form.name,
+        intake_cents: Math.round(parseFloat(form.intake_cents) * 100),
+        session_cents: Math.round(parseFloat(form.session_cents) * 100),
+        duration_minutes: form.duration_minutes ? Number(form.duration_minutes) : null,
+        insurance_payer: form.insurance_payer || null,
+        notes: form.notes || null,
+        active: form.active,
+      },
+    });
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex justify-end">
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <Button
+              className="rounded-full"
+              onClick={() => {
+                setEditing(null);
+                setForm({
+                  therapist_id: therapists[0]?.id ?? "",
+                  name: "",
+                  intake_cents: "",
+                  session_cents: "",
+                  duration_minutes: "",
+                  insurance_payer: "",
+                  notes: "",
+                  active: true,
+                });
+              }}
+            >
+              <Plus className="w-4 h-4 mr-2" /> Add Service Type
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-lg">
+            <DialogHeader>
+              <DialogTitle>{editing ? "Edit Service Type" : "Add Service Type"}</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleSubmit} className="space-y-4 mt-2">
+              <div className="space-y-2">
+                <Label>Therapist</Label>
+                <Select value={form.therapist_id} onValueChange={(v) => setForm({ ...form, therapist_id: v })}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select therapist" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {therapists.map((t) => (
+                      <SelectItem key={t.id} value={t.id}>
+                        {t.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Service Name</Label>
+                <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Intake Amount ($)</Label>
+                  <Input
+                    type="number"
+                    step={0.01}
+                    min={0}
+                    value={form.intake_cents}
+                    onChange={(e) => setForm({ ...form, intake_cents: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Session Amount ($)</Label>
+                  <Input
+                    type="number"
+                    step={0.01}
+                    min={0}
+                    value={form.session_cents}
+                    onChange={(e) => setForm({ ...form, session_cents: e.target.value })}
+                    required
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Duration (minutes)</Label>
+                  <Input
+                    type="number"
+                    value={form.duration_minutes}
+                    onChange={(e) => setForm({ ...form, duration_minutes: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Insurance Payer</Label>
+                  <Input
+                    value={form.insurance_payer}
+                    onChange={(e) => setForm({ ...form, insurance_payer: e.target.value })}
+                    placeholder="e.g. Aetna"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Notes</Label>
+                <Input value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
+              </div>
+              <div className="flex items-center gap-2">
+                <input
+                  id="st-active"
+                  type="checkbox"
+                  checked={form.active}
+                  onChange={(e) => setForm({ ...form, active: e.target.checked })}
+                  className="h-4 w-4 rounded border-border"
+                />
+                <Label htmlFor="st-active" className="font-normal">Active</Label>
+              </div>
+              <Button type="submit" className="w-full rounded-full" disabled={mutation.isPending}>
+                {mutation.isPending ? "Saving…" : "Save Service Type"}
+              </Button>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      <div className="rounded-2xl border border-border bg-card overflow-hidden">
+        <table className="w-full text-sm">
+          <thead className="bg-secondary/50 text-left">
+            <tr>
+              <th className="px-4 py-3 font-medium">Therapist</th>
+              <th className="px-4 py-3 font-medium">Service</th>
+              <th className="px-4 py-3 font-medium">Insurance</th>
+              <th className="px-4 py-3 font-medium">Intake</th>
+              <th className="px-4 py-3 font-medium">Session</th>
+              <th className="px-4 py-3 font-medium">Duration</th>
+              <th className="px-4 py-3 font-medium text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border">
+            {serviceTypes.map((st) => {
+              const therapist = therapists.find((t) => t.id === st.therapist_id);
+              return (
+                <tr key={st.id} className="hover:bg-secondary/20">
+                  <td className="px-4 py-3">{therapist?.name || "—"}</td>
+                  <td className="px-4 py-3 font-medium">{st.name}</td>
+                  <td className="px-4 py-3 text-muted-foreground">{st.insurance_payer || "—"}</td>
+                  <td className="px-4 py-3">{formatMoney((st.intake_cents / 100).toFixed(2))}</td>
+                  <td className="px-4 py-3">{formatMoney((st.session_cents / 100).toFixed(2))}</td>
+                  <td className="px-4 py-3">{st.duration_minutes ? `${st.duration_minutes} min` : "—"}</td>
+                  <td className="px-4 py-3 text-right">
+                    <Button variant="ghost" size="icon" title="Edit" onClick={() => startEdit(st)}>
+                      <Plus className="w-4 h-4 rotate-45" />
+                    </Button>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
@@ -283,12 +652,11 @@ function SessionForm({
     is_intake: initial?.is_intake ?? false,
     units: initial?.units ?? 1,
     billed_cents: initial ? (initial.billed_cents / 100).toFixed(2) : "",
-    split_percent: initial?.split_percent ?? 55,
+    split_percent: initial?.split_percent ?? therapists[0]?.split_percent ?? 55,
     status: initial?.status ?? "logged",
     notes: initial?.notes ?? "",
   });
 
-  const selectedTherapist = therapists.find((t) => t.id === form.therapist_id);
   const selectedService = serviceTypes.find((st) => st.id === form.service_type_id);
 
   const handleSubmit = (e: React.FormEvent) => {
