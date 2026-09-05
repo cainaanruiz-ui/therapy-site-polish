@@ -50,9 +50,11 @@ export const listTherapists = createServerFn({ method: "GET" })
     return (data ?? []) as Therapist[];
   });
 
+export type TherapistInput = Omit<Therapist, "id"> & { id?: string };
+
 export const upsertTherapist = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: Therapist) => input)
+  .inputValidator((input: TherapistInput) => input)
   .handler(async ({ data, context }) => {
     const isAdmin = await context.supabase.rpc("has_role", {
       _user_id: context.userId,
