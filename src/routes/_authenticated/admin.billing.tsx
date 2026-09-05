@@ -209,7 +209,7 @@ function BillingPage() {
                         variant="ghost"
                         size="icon"
                         title="Mark paid"
-                        onClick={() => statusMutation.mutate({ id: s.id, status: "paid" })}
+                        onClick={() => statusMutation.mutate({ data: { id: s.id, status: "paid" } })}
                       >
                         <CircleDollarSign className="w-4 h-4" />
                       </Button>
@@ -219,7 +219,7 @@ function BillingPage() {
                         variant="ghost"
                         size="icon"
                         title="Mark logged"
-                        onClick={() => statusMutation.mutate({ id: s.id, status: "logged" })}
+                        onClick={() => statusMutation.mutate({ data: { id: s.id, status: "logged" } })}
                       >
                         <CheckCircle2 className="w-4 h-4" />
                       </Button>
@@ -239,7 +239,7 @@ function BillingPage() {
                       variant="ghost"
                       size="icon"
                       title="Delete"
-                      onClick={() => deleteMutation.mutate({ id: s.id })}
+                      onClick={() => deleteMutation.mutate({ data: { id: s.id } })}
                     >
                       <Trash2 className="w-4 h-4 text-destructive" />
                     </Button>
