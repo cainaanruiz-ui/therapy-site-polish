@@ -35,7 +35,12 @@ export function CartDrawer() {
   const handleCheckout = () => {
     const url = getCheckoutUrl();
     if (url) {
-      window.open(url, "_blank");
+      const win = window.open(url, "_blank");
+      if (!win || win.closed || typeof win.closed === "undefined") {
+        // Popup was blocked — navigate in the same tab instead
+        window.location.href = url;
+        return;
+      }
       setIsOpen(false);
     }
   };
