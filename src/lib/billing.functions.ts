@@ -87,9 +87,11 @@ export const listServiceTypes = createServerFn({ method: "GET" })
     return (data ?? []) as ServiceType[];
   });
 
+export type ServiceTypeInput = Omit<ServiceType, "id"> & { id?: string };
+
 export const upsertServiceType = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: ServiceType) => input)
+  .inputValidator((input: ServiceTypeInput) => input)
   .handler(async ({ data, context }) => {
     const isAdmin = await context.supabase.rpc("has_role", {
       _user_id: context.userId,
