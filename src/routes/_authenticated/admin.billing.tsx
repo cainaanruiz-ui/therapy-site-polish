@@ -128,9 +128,8 @@ function BillingPage() {
               initial={editing}
               onSubmit={(data) =>
                 saveMutation.mutate({
-                  ...data,
-                  id: editing?.id,
-                } as Parameters<typeof saveSession>[0])
+                  data: { ...data, id: editing?.id },
+                })
               }
               loading={saveMutation.isPending}
             />
