@@ -67,11 +67,10 @@ function ShopPage() {
       <section className="mx-auto max-w-6xl px-5 sm:px-8 pt-16 md:pt-20 pb-10">
         <div className="text-xs uppercase tracking-widest text-muted-foreground mb-3">Shop</div>
         <h1 className="font-display text-5xl md:text-6xl text-primary max-w-3xl leading-[1.05]">
-          Wellness tools for everyday calm.
+          Therapy-centered wellness tools.
         </h1>
         <p className="mt-5 text-lg text-muted-foreground max-w-2xl">
-          A small, thoughtful collection of fidgets and sensory tools chosen to support your mental
-          health journey between sessions.
+          A curated collection of calming items — weighted blankets, diffusers, journals, and more — chosen to support your mental health journey between sessions.
         </p>
       </section>
 
