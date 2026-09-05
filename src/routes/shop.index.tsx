@@ -52,11 +52,11 @@ export const Route = createFileRoute("/shop/")({
 
 function ShopPage() {
   const { data: products, isLoading, error } = useQuery({
-    queryKey: ["shopify-products"],
+    queryKey: ["shopify-products", "happy-2-help"],
     queryFn: async () => {
       const res = await storefrontApiRequest<{ products: { edges: ShopifyProduct[] } }>(
         PRODUCTS_QUERY,
-        { first: 50 },
+        { first: 50, query: "vendor:Happy 2 Help Counseling" },
       );
       return res?.data?.products?.edges ?? [];
     },
