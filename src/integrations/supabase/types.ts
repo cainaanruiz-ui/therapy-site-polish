@@ -161,6 +161,158 @@ export type Database = {
         }
         Relationships: []
       }
+      service_types: {
+        Row: {
+          active: boolean
+          created_at: string
+          duration_minutes: number | null
+          id: string
+          insurance_payer: string | null
+          intake_cents: number
+          name: string
+          notes: string | null
+          session_cents: number
+          therapist_id: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          duration_minutes?: number | null
+          id?: string
+          insurance_payer?: string | null
+          intake_cents?: number
+          name: string
+          notes?: string | null
+          session_cents?: number
+          therapist_id: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          duration_minutes?: number | null
+          id?: string
+          insurance_payer?: string | null
+          intake_cents?: number
+          name?: string
+          notes?: string | null
+          session_cents?: number
+          therapist_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_types_therapist_id_fkey"
+            columns: ["therapist_id"]
+            isOneToOne: false
+            referencedRelation: "therapists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sessions: {
+        Row: {
+          billed_cents: number
+          client_insurance: string | null
+          client_name: string
+          created_at: string
+          created_by: string | null
+          id: string
+          is_intake: boolean
+          notes: string | null
+          service_type_id: string | null
+          session_date: string
+          split_percent: number
+          status: Database["public"]["Enums"]["session_status"]
+          therapist_id: string
+          therapist_split_cents: number | null
+          units: number
+          updated_at: string
+        }
+        Insert: {
+          billed_cents?: number
+          client_insurance?: string | null
+          client_name: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_intake?: boolean
+          notes?: string | null
+          service_type_id?: string | null
+          session_date: string
+          split_percent?: number
+          status?: Database["public"]["Enums"]["session_status"]
+          therapist_id: string
+          therapist_split_cents?: number | null
+          units?: number
+          updated_at?: string
+        }
+        Update: {
+          billed_cents?: number
+          client_insurance?: string | null
+          client_name?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_intake?: boolean
+          notes?: string | null
+          service_type_id?: string | null
+          session_date?: string
+          split_percent?: number
+          status?: Database["public"]["Enums"]["session_status"]
+          therapist_id?: string
+          therapist_split_cents?: number | null
+          units?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sessions_service_type_id_fkey"
+            columns: ["service_type_id"]
+            isOneToOne: false
+            referencedRelation: "service_types"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sessions_therapist_id_fkey"
+            columns: ["therapist_id"]
+            isOneToOne: false
+            referencedRelation: "therapists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      therapists: {
+        Row: {
+          active: boolean
+          created_at: string
+          email: string | null
+          id: string
+          name: string
+          split_percent: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          email?: string | null
+          id?: string
+          name: string
+          split_percent?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string
+          split_percent?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -204,6 +356,7 @@ export type Database = {
         | "shipped"
         | "cancelled"
         | "refunded"
+      session_status: "logged" | "submitted" | "paid"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -340,6 +493,7 @@ export const Constants = {
         "cancelled",
         "refunded",
       ],
+      session_status: ["logged", "submitted", "paid"],
     },
   },
 } as const

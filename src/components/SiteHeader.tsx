@@ -12,6 +12,7 @@ const links = [
   { to: "/shop", label: "Shop" },
   { to: "/careers", label: "Careers" },
   { to: "/contact", label: "Contact" },
+  { to: "/admin/billing", label: "Admin" },
 ];
 
 export function SiteHeader() {
