@@ -15,12 +15,14 @@ import { Route as FaviconDoticoRouteImport } from './routes/favicon[.]ico'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CareersRouteImport } from './routes/careers'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ShopIndexRouteImport } from './routes/shop.index'
 import { Route as ServicesIndexRouteImport } from './routes/services.index'
 import { Route as ShopHandleRouteImport } from './routes/shop.$handle'
 import { Route as ServicesSlugRouteImport } from './routes/services.$slug'
 import { Route as ApiBookingRouteImport } from './routes/api/booking'
+import { Route as AuthenticatedAdminBillingRouteImport } from './routes/_authenticated/admin.billing'
 
 const TeamRoute = TeamRouteImport.update({
   id: '/team',
@@ -50,6 +52,10 @@ const CareersRoute = CareersRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -82,6 +88,12 @@ const ApiBookingRoute = ApiBookingRouteImport.update({
   path: '/api/booking',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAdminBillingRoute =
+  AuthenticatedAdminBillingRouteImport.update({
+    id: '/admin/billing',
+    path: '/admin/billing',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -96,6 +108,7 @@ export interface FileRoutesByFullPath {
   '/shop/$handle': typeof ShopHandleRoute
   '/services/': typeof ServicesIndexRoute
   '/shop/': typeof ShopIndexRoute
+  '/admin/billing': typeof AuthenticatedAdminBillingRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -110,10 +123,12 @@ export interface FileRoutesByTo {
   '/shop/$handle': typeof ShopHandleRoute
   '/services': typeof ServicesIndexRoute
   '/shop': typeof ShopIndexRoute
+  '/admin/billing': typeof AuthenticatedAdminBillingRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/careers': typeof CareersRoute
   '/contact': typeof ContactRoute
@@ -125,6 +140,7 @@ export interface FileRoutesById {
   '/shop/$handle': typeof ShopHandleRoute
   '/services/': typeof ServicesIndexRoute
   '/shop/': typeof ShopIndexRoute
+  '/_authenticated/admin/billing': typeof AuthenticatedAdminBillingRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -141,6 +157,7 @@ export interface FileRouteTypes {
     | '/shop/$handle'
     | '/services/'
     | '/shop/'
+    | '/admin/billing'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -155,9 +172,11 @@ export interface FileRouteTypes {
     | '/shop/$handle'
     | '/services'
     | '/shop'
+    | '/admin/billing'
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
     | '/auth'
     | '/careers'
     | '/contact'
@@ -169,10 +188,12 @@ export interface FileRouteTypes {
     | '/shop/$handle'
     | '/services/'
     | '/shop/'
+    | '/_authenticated/admin/billing'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   CareersRoute: typeof CareersRoute
   ContactRoute: typeof ContactRoute
@@ -230,6 +251,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -272,11 +300,30 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiBookingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin/billing': {
+      id: '/_authenticated/admin/billing'
+      path: '/admin/billing'
+      fullPath: '/admin/billing'
+      preLoaderRoute: typeof AuthenticatedAdminBillingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminBillingRoute: typeof AuthenticatedAdminBillingRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminBillingRoute: AuthenticatedAdminBillingRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   CareersRoute: CareersRoute,
   ContactRoute: ContactRoute,

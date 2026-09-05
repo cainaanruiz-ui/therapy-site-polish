@@ -122,7 +122,7 @@ export const listSessions = createServerFn({ method: "GET" })
 export type SessionInput = Omit<
   Session,
   "id" | "therapist_split_cents" | "created_at" | "updated_at" | "therapist" | "service_type"
->;
+> & { id?: string };
 
 export const upsertSession = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -134,7 +134,7 @@ export const upsertSession = createServerFn({ method: "POST" })
     });
     if (!isAdmin.data) throw new Error("Forbidden");
 
-    const { id, ...rest } = data as SessionInput & { id?: string };
+    const { id, ...rest } = data;
     const payload = {
       ...rest,
       created_by: context.userId,
