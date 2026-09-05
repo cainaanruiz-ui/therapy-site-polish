@@ -1,4 +1,4 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, redirect, Outlet } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteLayout } from "@/components/SiteLayout";
 
@@ -21,5 +21,3 @@ function AuthenticatedLayout() {
     </SiteLayout>
   );
 }
-
-import { Outlet } from "@tanstack/react-router";
