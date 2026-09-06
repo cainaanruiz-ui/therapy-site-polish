@@ -55,7 +55,10 @@ function ProductPage() {
         PRODUCT_BY_HANDLE_QUERY,
         { handle },
       );
-      return res?.data?.productByHandle ?? null;
+      const node = res?.data?.productByHandle ?? null;
+      // Only therapy-centered products belong on this site
+      if (!node || node.productType !== "Therapy & Wellness") return null;
+      return node;
     },
   });
   const [quantity, setQuantity] = useState(1);
