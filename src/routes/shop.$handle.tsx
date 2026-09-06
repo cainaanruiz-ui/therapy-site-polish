@@ -88,7 +88,9 @@ function ProductPage() {
     );
   }
 
-  const variant = product.variants.edges[0]?.node;
+  const variant =
+    product.variants.edges.find((v) => v.node.availableForSale)?.node ??
+    product.variants.edges[0]?.node;
   const image = product.images.edges[0]?.node;
 
   const handleAdd = async () => {

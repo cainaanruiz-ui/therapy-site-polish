@@ -15,13 +15,15 @@ export const Route = createFileRoute("/shop/")({
       {
         name: "description",
         content:
-          "Fidgets, sensory tools, and calming wellness items thoughtfully chosen to support your mental health journey.",
+          "Yoga mats, massage rollers, acupressure balls, stretching straps and posture support — calming wellness tools chosen by our counselors to help relieve stress and tension.",
       },
       { property: "og:title", content: "Wellness Shop — Happy 2 Help Counseling" },
       {
         property: "og:description",
-        content: "Fidgets and wellness tools to support your mental health.",
+        content: "Calming wellness and stress-relief tools chosen by our counselors.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   errorComponent: ({ reset }) => {
@@ -70,7 +72,9 @@ function ShopPage() {
           Therapy-centered wellness tools.
         </h1>
         <p className="mt-5 text-lg text-muted-foreground max-w-2xl">
-          A curated collection of calming items — weighted blankets, diffusers, journals, and more — chosen to support your mental health journey between sessions.
+          A curated collection of calming, body-based tools — yoga and meditation mats, massage
+          rollers, acupressure balls, stretching straps and posture support — chosen to help you
+          release stress between sessions.
         </p>
       </section>
 
@@ -107,7 +111,8 @@ function ProductCard({ product }: { product: ShopifyProduct }) {
   const addItem = useCartStore((s) => s.addItem);
   const isLoading = useCartStore((s) => s.isLoading);
   const node = product.node;
-  const variant = node.variants.edges[0]?.node;
+  const variant =
+    node.variants.edges.find((v) => v.node.availableForSale)?.node ?? node.variants.edges[0]?.node;
   const image = node.images.edges[0]?.node;
 
   const handleAdd = async () => {
