@@ -70,7 +70,9 @@ function ShopPage() {
           Therapy-centered wellness tools.
         </h1>
         <p className="mt-5 text-lg text-muted-foreground max-w-2xl">
-          A curated collection of calming items — weighted blankets, diffusers, journals, and more — chosen to support your mental health journey between sessions.
+          A curated collection of calming, body-based tools — yoga and meditation mats, massage
+          rollers, acupressure balls, stretching straps and posture support — chosen to help you
+          release stress between sessions.
         </p>
       </section>
 
