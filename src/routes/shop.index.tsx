@@ -15,12 +15,12 @@ export const Route = createFileRoute("/shop/")({
       {
         name: "description",
         content:
-          "Yoga mats, massage rollers, acupressure balls, stretching straps and posture support — calming wellness tools chosen by our counselors to help relieve stress and tension.",
+          "Shop therapy-centered tools for calming, grounding, reflection, mindfulness, and restorative self-care from Happy 2 Help Counseling.",
       },
       { property: "og:title", content: "Wellness Shop — Happy 2 Help Counseling" },
       {
         property: "og:description",
-        content: "Calming wellness and stress-relief tools chosen by our counselors.",
+        content: "Therapy-centered tools for calming, grounding, reflection, and restorative self-care.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -58,7 +58,7 @@ function ShopPage() {
     queryFn: async () => {
       const res = await storefrontApiRequest<{ products: { edges: ShopifyProduct[] } }>(
         PRODUCTS_QUERY,
-        { first: 50, query: "vendor:Happy 2 Help Counseling" },
+        { first: 50, query: 'product_type:"Therapy & Wellness"' },
       );
       return res?.data?.products?.edges ?? [];
     },
@@ -72,9 +72,8 @@ function ShopPage() {
           Therapy-centered wellness tools.
         </h1>
         <p className="mt-5 text-lg text-muted-foreground max-w-2xl">
-          A curated collection of calming, body-based tools — yoga and meditation mats, massage
-          rollers, acupressure balls, stretching straps and posture support — chosen to help you
-          release stress between sessions.
+          A focused collection for calming, grounding, reflection, and mindful routines — chosen
+          to support your well-being between sessions.
         </p>
       </section>
 
