@@ -15,13 +15,15 @@ export const Route = createFileRoute("/shop/")({
       {
         name: "description",
         content:
-          "Fidgets, sensory tools, and calming wellness items thoughtfully chosen to support your mental health journey.",
+          "Yoga mats, massage rollers, acupressure balls, stretching straps and posture support — calming wellness tools chosen by our counselors to help relieve stress and tension.",
       },
       { property: "og:title", content: "Wellness Shop — Happy 2 Help Counseling" },
       {
         property: "og:description",
-        content: "Fidgets and wellness tools to support your mental health.",
+        content: "Calming wellness and stress-relief tools chosen by our counselors.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   errorComponent: ({ reset }) => {
