@@ -107,7 +107,8 @@ function ProductCard({ product }: { product: ShopifyProduct }) {
   const addItem = useCartStore((s) => s.addItem);
   const isLoading = useCartStore((s) => s.isLoading);
   const node = product.node;
-  const variant = node.variants.edges[0]?.node;
+  const variant =
+    node.variants.edges.find((v) => v.node.availableForSale)?.node ?? node.variants.edges[0]?.node;
   const image = node.images.edges[0]?.node;
 
   const handleAdd = async () => {
