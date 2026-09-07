@@ -350,6 +350,7 @@ function BillingPage() {
 function TherapistsTab({ therapists }: { therapists: Therapist[] }) {
   const queryClient = useQueryClient();
   const saveTherapist = useServerFn(upsertTherapist);
+  const removeTherapist = useServerFn(deleteTherapist);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Therapist | null>(null);
   const [form, setForm] = useState({ name: "", email: "", split_percent: 55, active: true });
@@ -361,6 +362,16 @@ function TherapistsTab({ therapists }: { therapists: Therapist[] }) {
       setOpen(false);
       setEditing(null);
       toast.success("Therapist saved");
+    },
+    onError: (err: Error) => toast.error(err.message),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: removeTherapist,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["therapists"] });
+      queryClient.invalidateQueries({ queryKey: ["service-types"] });
+      toast.success("Therapist removed");
     },
     onError: (err: Error) => toast.error(err.message),
   });
@@ -466,6 +477,16 @@ function TherapistsTab({ therapists }: { therapists: Therapist[] }) {
                   <Button variant="ghost" size="icon" title="Edit" onClick={() => startEdit(t)}>
                     <Plus className="w-4 h-4 rotate-45" />
                   </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    title="Delete"
+                    onClick={() => {
+                      if (confirm(`Remove ${t.name}?`)) deleteMutation.mutate({ data: { id: t.id } });
+                    }}
+                  >
+                    <Trash2 className="w-4 h-4 text-destructive" />
+                  </Button>
                 </td>
               </tr>
             ))}
@@ -479,6 +500,7 @@ function TherapistsTab({ therapists }: { therapists: Therapist[] }) {
 function ServiceTypesTab({ therapists, serviceTypes }: { therapists: Therapist[]; serviceTypes: ServiceType[] }) {
   const queryClient = useQueryClient();
   const saveService = useServerFn(upsertServiceType);
+  const removeService = useServerFn(deleteServiceType);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<ServiceType | null>(null);
   const [form, setForm] = useState({
@@ -499,6 +521,15 @@ function ServiceTypesTab({ therapists, serviceTypes }: { therapists: Therapist[]
       setOpen(false);
       setEditing(null);
       toast.success("Service type saved");
+    },
+    onError: (err: Error) => toast.error(err.message),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: removeService,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["service-types"] });
+      toast.success("Service type removed");
     },
     onError: (err: Error) => toast.error(err.message),
   });
@@ -675,6 +706,16 @@ function ServiceTypesTab({ therapists, serviceTypes }: { therapists: Therapist[]
                     <Button variant="ghost" size="icon" title="Edit" onClick={() => startEdit(st)}>
                       <Plus className="w-4 h-4 rotate-45" />
                     </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      title="Delete"
+                      onClick={() => {
+                        if (confirm(`Remove ${st.name}?`)) deleteMutation.mutate({ data: { id: st.id } });
+                      }}
+                    >
+                      <Trash2 className="w-4 h-4 text-destructive" />
+                    </Button>
                   </td>
                 </tr>
               );
@@ -706,6 +747,7 @@ function SessionForm({
     client_insurance: initial?.client_insurance ?? "",
     session_date: initial?.session_date ?? new Date().toISOString().split("T")[0],
     is_intake: initial?.is_intake ?? false,
+    duration_minutes: initial?.duration_minutes?.toString() ?? "",
     units: initial?.units ?? 1,
     billed_cents: initial ? (initial.billed_cents / 100).toFixed(2) : "",
     split_percent: initial?.split_percent ?? therapists[0]?.split_percent ?? 55,
@@ -725,6 +767,7 @@ function SessionForm({
       client_insurance: form.client_insurance || null,
       session_date: form.session_date,
       is_intake: form.is_intake,
+      duration_minutes: form.duration_minutes ? Number(form.duration_minutes) : null,
       units: Number(form.units),
       billed_cents: cents,
       split_percent: Number(form.split_percent),
@@ -799,6 +842,19 @@ function SessionForm({
           />
         </div>
         <div className="space-y-2">
+          <Label>Visit Length (minutes)</Label>
+          <Input
+            type="number"
+            min={0}
+            value={form.duration_minutes}
+            onChange={(e) => setForm({ ...form, duration_minutes: e.target.value })}
+            placeholder="e.g. 53"
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
           <Label>Units</Label>
           <Input
             type="number"
@@ -820,6 +876,7 @@ function SessionForm({
               ...f,
               service_type_id: v,
               billed_cents: amount ? (amount / 100).toFixed(2) : f.billed_cents,
+              duration_minutes: st?.duration_minutes ? String(st.duration_minutes) : f.duration_minutes,
             }));
           }}
         >
