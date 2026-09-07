@@ -20,6 +20,9 @@ export const Route = createFileRoute("/contact")({
 function ContactPage() {
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
+  const today = new Date().toISOString().slice(0, 10);
+
+
 
   return (
     <SiteLayout>
@@ -189,18 +192,50 @@ function ContactPage() {
   );
 }
 
+const TIME_SLOTS = [
+  "09:00",
+  "10:00",
+  "11:00",
+  "12:00",
+  "13:00",
+  "14:00",
+  "15:00",
+  "16:00",
+  "17:00",
+  "18:00",
+];
+
+function formatTime(value: string) {
+  const [h, m] = value.split(":").map(Number);
+  const suffix = h >= 12 ? "PM" : "AM";
+  const hour12 = h % 12 === 0 ? 12 : h % 12;
+  return `${hour12}:${String(m).padStart(2, "0")} ${suffix}`;
+}
+
+function formatDate(value: string) {
+  const [y, m, d] = value.split("-").map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
 function Field({
   name,
   label,
   type = "text",
   required,
   textarea,
+  min,
 }: {
   name: string;
   label: string;
   type?: string;
   required?: boolean;
   textarea?: boolean;
+  min?: string;
 }) {
   const cls =
     "mt-1.5 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring/40";
@@ -213,7 +248,7 @@ function Field({
       {textarea ? (
         <textarea name={name} rows={5} required={required} className={cls} />
       ) : (
-        <input name={name} type={type} required={required} className={cls} />
+        <input name={name} type={type} min={min} required={required} className={cls} />
       )}
     </label>
   );
