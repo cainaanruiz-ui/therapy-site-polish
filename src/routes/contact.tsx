@@ -40,10 +40,20 @@ function ContactPage() {
             e.preventDefault();
             const form = e.currentTarget;
             const data = new FormData(form);
+            const date = String(data.get("date") || "");
+            const time = String(data.get("time") || "");
+            const altTimes = String(data.get("times") || "");
+            const preferred = [
+              date ? `Preferred date: ${formatDate(date)}` : "",
+              time ? `Preferred time: ${formatTime(time)}` : "",
+              altTimes ? `Other times that work: ${altTimes}` : "",
+            ]
+              .filter(Boolean)
+              .join(" | ");
             const payload = {
               name: String(data.get("name") || ""),
               email: String(data.get("email") || ""),
-              times: String(data.get("times") || ""),
+              times: preferred,
               message: String(data.get("message") || ""),
             };
             setStatus("sending");
@@ -73,8 +83,32 @@ function ContactPage() {
           <h2 className="font-display text-2xl text-primary">Booking Request</h2>
           <Field name="name" label="Full name" required />
           <Field name="email" label="Your email" type="email" required />
-          <Field name="times" label="Preferred days/times" />
+          <div className="grid sm:grid-cols-2 gap-4">
+            <Field name="date" label="Preferred date" type="date" min={today} />
+            <label className="block">
+              <span className="text-xs uppercase tracking-widest text-muted-foreground">
+                Preferred time
+              </span>
+              <select
+                name="time"
+                defaultValue=""
+                className="mt-1.5 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring/40"
+              >
+                <option value="">Select a time</option>
+                {TIME_SLOTS.map((slot) => (
+                  <option key={slot} value={slot}>
+                    {formatTime(slot)}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+          <Field name="times" label="Other days/times that work" />
           <Field name="message" label="Message" textarea />
+          <p className="text-xs text-muted-foreground">
+            Choosing a day and time sends it with your request. Luis will call or email you to
+            confirm the appointment.
+          </p>
           <button
             type="submit"
             disabled={status === "sending"}
