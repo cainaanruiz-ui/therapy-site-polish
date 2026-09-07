@@ -29,6 +29,7 @@ export type Session = {
   client_insurance: string | null;
   session_date: string;
   is_intake: boolean;
+  duration_minutes: number | null;
   units: number;
   billed_cents: number;
   therapist_split_cents: number;
