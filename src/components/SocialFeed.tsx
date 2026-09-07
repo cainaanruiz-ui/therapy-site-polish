@@ -1,9 +1,10 @@
 import { useEffect } from "react";
-import { ArrowUpRight, Facebook } from "lucide-react";
+import { ArrowUpRight, Facebook, Instagram } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const FACEBOOK_URL = "https://www.facebook.com/people/Happy-2-Help-Counseling/61590639628174/";
 const TIKTOK_URL = "https://www.tiktok.com/@happy2help59";
+const INSTAGRAM_URL = "https://www.instagram.com/happy2helpcounseling";
 
 export function SocialFeed() {
   useEffect(() => {
