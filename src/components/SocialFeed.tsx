@@ -46,6 +46,11 @@ export function SocialFeed() {
                   Facebook <ArrowUpRight />
                 </a>
               </Button>
+              <Button asChild variant="outline" className="rounded-full">
+                <a href={INSTAGRAM_URL} target="_blank" rel="noreferrer">
+                  Instagram <ArrowUpRight />
+                </a>
+              </Button>
             </div>
           </div>
 
