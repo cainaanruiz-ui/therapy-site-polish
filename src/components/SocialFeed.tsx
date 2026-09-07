@@ -1,9 +1,10 @@
 import { useEffect } from "react";
-import { ArrowUpRight, Facebook } from "lucide-react";
+import { ArrowUpRight, Facebook, Instagram } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const FACEBOOK_URL = "https://www.facebook.com/people/Happy-2-Help-Counseling/61590639628174/";
 const TIKTOK_URL = "https://www.tiktok.com/@happy2help59";
+const INSTAGRAM_URL = "https://www.instagram.com/happy2helpcounseling";
 
 export function SocialFeed() {
   useEffect(() => {
@@ -43,6 +44,11 @@ export function SocialFeed() {
               <Button asChild variant="outline" className="rounded-full">
                 <a href={FACEBOOK_URL} target="_blank" rel="noreferrer">
                   Facebook <ArrowUpRight />
+                </a>
+              </Button>
+              <Button asChild variant="outline" className="rounded-full">
+                <a href={INSTAGRAM_URL} target="_blank" rel="noreferrer">
+                  Instagram <ArrowUpRight />
                 </a>
               </Button>
             </div>
@@ -92,6 +98,33 @@ export function SocialFeed() {
                   Visit our page <ArrowUpRight size={16} />
                 </div>
                 <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-[#1877F2]/0 via-[#1877F2] to-[#1877F2]/0 opacity-0 transition-opacity group-hover:opacity-100" />
+              </a>
+            </div>
+
+            <div className="min-w-0 overflow-hidden rounded-3xl border border-border bg-background p-3 shadow-sm sm:col-span-2">
+              <div className="mb-3 px-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                Latest on Instagram
+              </div>
+              <a
+                href={INSTAGRAM_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="group relative flex h-56 flex-col items-center justify-center gap-4 overflow-hidden rounded-2xl bg-gradient-to-br from-[#833AB4]/10 via-[#FD1D1D]/5 to-[#FCB045]/10 p-8 text-center transition-all hover:from-[#833AB4]/20 hover:via-[#FD1D1D]/10 hover:to-[#FCB045]/20 hover:shadow-md"
+              >
+                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[#833AB4] via-[#FD1D1D] to-[#FCB045] text-white shadow-lg transition-transform group-hover:scale-110">
+                  <Instagram size={30} />
+                </div>
+                <div className="space-y-1">
+                  <h3 className="font-display text-2xl font-semibold text-foreground">
+                    @happy2helpcounseling
+                  </h3>
+                  <p className="text-sm leading-relaxed text-muted-foreground">
+                    Daily encouragement and behind-the-scenes moments from our practice.
+                  </p>
+                </div>
+                <div className="inline-flex items-center gap-2 rounded-full border border-[#FD1D1D]/30 bg-[#FD1D1D]/10 px-5 py-2 text-sm font-medium text-[#C13584] transition-colors group-hover:bg-[#C13584] group-hover:text-white">
+                  Follow us <ArrowUpRight size={16} />
+                </div>
               </a>
             </div>
           </div>
