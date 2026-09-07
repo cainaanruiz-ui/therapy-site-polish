@@ -74,7 +74,7 @@ export const PRODUCTS_QUERY = `
           handle
           priceRange { minVariantPrice { amount currencyCode } }
           images(first: 5) { edges { node { url altText } } }
-          variants(first: 10) {
+          variants(first: 100) {
             edges {
               node {
                 id
@@ -102,7 +102,7 @@ export const PRODUCT_BY_HANDLE_QUERY = `
       productType
       priceRange { minVariantPrice { amount currencyCode } }
       images(first: 8) { edges { node { url altText } } }
-      variants(first: 20) {
+      variants(first: 250) {
         edges {
           node {
             id
