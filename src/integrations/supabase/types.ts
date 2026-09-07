@@ -218,6 +218,7 @@ export type Database = {
           client_name: string
           created_at: string
           created_by: string | null
+          duration_minutes: number | null
           id: string
           is_intake: boolean
           notes: string | null
@@ -236,6 +237,7 @@ export type Database = {
           client_name: string
           created_at?: string
           created_by?: string | null
+          duration_minutes?: number | null
           id?: string
           is_intake?: boolean
           notes?: string | null
@@ -254,6 +256,7 @@ export type Database = {
           client_name?: string
           created_at?: string
           created_by?: string | null
+          duration_minutes?: number | null
           id?: string
           is_intake?: boolean
           notes?: string | null

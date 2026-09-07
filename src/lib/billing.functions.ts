@@ -29,6 +29,7 @@ export type Session = {
   client_insurance: string | null;
   session_date: string;
   is_intake: boolean;
+  duration_minutes: number | null;
   units: number;
   billed_cents: number;
   therapist_split_cents: number;
@@ -181,6 +182,47 @@ export const deleteSession = createServerFn({ method: "POST" })
     if (!isAdmin.data) throw new Error("Forbidden");
 
     const { error } = await context.supabase.from("sessions").delete().eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const deleteTherapist = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { id: string }) => input)
+  .handler(async ({ data, context }) => {
+    const isAdmin = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "admin",
+    });
+    if (!isAdmin.data) throw new Error("Forbidden");
+
+    const { count } = await context.supabase
+      .from("sessions")
+      .select("id", { count: "exact", head: true })
+      .eq("therapist_id", data.id);
+    if ((count ?? 0) > 0) {
+      throw new Error(
+        "This therapist has logged sessions. Delete or reassign those sessions first, or mark the therapist inactive.",
+      );
+    }
+
+    await context.supabase.from("service_types").delete().eq("therapist_id", data.id);
+    const { error } = await context.supabase.from("therapists").delete().eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const deleteServiceType = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { id: string }) => input)
+  .handler(async ({ data, context }) => {
+    const isAdmin = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "admin",
+    });
+    if (!isAdmin.data) throw new Error("Forbidden");
+
+    const { error } = await context.supabase.from("service_types").delete().eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
   });

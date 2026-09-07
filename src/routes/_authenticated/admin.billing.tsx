@@ -29,13 +29,15 @@ import {
   upsertServiceType,
   updateSessionStatus,
   deleteSession,
+  deleteTherapist,
+  deleteServiceType,
   type Session,
   type ServiceType,
   type Therapist,
 } from "@/lib/billing.functions";
 import { useServerFn } from "@tanstack/react-start";
 import { formatMoney } from "@/stores/cartStore";
-import { Plus, Trash2, CheckCircle2, CircleDollarSign, LogOut } from "lucide-react";
+import { Plus, Trash2, CheckCircle2, CircleDollarSign, LogOut, Download } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -48,6 +50,22 @@ export const Route = createFileRoute("/_authenticated/admin/billing")({
     ],
   }),
 });
+
+function toCsv(rows: string[][]) {
+  return rows
+    .map((r) => r.map((c) => `"${(c ?? "").toString().replace(/"/g, '""')}"`).join(","))
+    .join("\n");
+}
+
+function downloadCsv(filename: string, rows: string[][]) {
+  const blob = new Blob([toCsv(rows)], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
 function BillingPage() {
   const queryClient = useQueryClient();
@@ -103,6 +121,30 @@ function BillingPage() {
     navigate({ to: "/auth" });
   };
 
+  const exportCsv = () => {
+    const header = [
+      "Date","Therapist","Split %","Client","Insurance","Service","Intake","Duration (min)","Units","Billed","Therapist Payout","Practice Share","Status","Notes",
+    ];
+    const rows = sessions.map((s) => [
+      s.session_date,
+      s.therapist?.name ?? "",
+      String(s.split_percent),
+      s.client_name,
+      s.client_insurance ?? "",
+      s.service_type?.name ?? "",
+      s.is_intake ? "Yes" : "No",
+      s.duration_minutes ? String(s.duration_minutes) : (s.service_type?.duration_minutes ? String(s.service_type.duration_minutes) : ""),
+      String(s.units),
+      (s.billed_cents / 100).toFixed(2),
+      (s.therapist_split_cents / 100).toFixed(2),
+      ((s.billed_cents - s.therapist_split_cents) / 100).toFixed(2),
+      s.status,
+      s.notes ?? "",
+    ]);
+    downloadCsv(`billing-${new Date().toISOString().split("T")[0]}.csv`, [header, ...rows]);
+    toast.success("CSV downloaded");
+  };
+
   const totals = therapists.map((t) => {
     const therapistSessions = sessions.filter((s) => s.therapist_id === t.id);
     const billed = therapistSessions.reduce((sum, s) => sum + s.billed_cents, 0);
@@ -120,6 +162,14 @@ function BillingPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            className="rounded-full"
+            onClick={exportCsv}
+            disabled={sessions.length === 0}
+          >
+            <Download className="w-4 h-4 mr-2" /> Export CSV
+          </Button>
           <Dialog open={sessionOpen} onOpenChange={setSessionOpen}>
             <DialogTrigger asChild>
               <Button className="rounded-full" onClick={() => setEditingSession(null)}>
@@ -188,6 +238,7 @@ function BillingPage() {
                   <th className="px-4 py-3 font-medium">Therapist</th>
                   <th className="px-4 py-3 font-medium">Client</th>
                   <th className="px-4 py-3 font-medium">Service</th>
+                  <th className="px-4 py-3 font-medium">Length</th>
                   <th className="px-4 py-3 font-medium text-right">Billed</th>
                   <th className="px-4 py-3 font-medium text-right">Payout</th>
                   <th className="px-4 py-3 font-medium">Status</th>
@@ -210,6 +261,11 @@ function BillingPage() {
                       {s.service_type?.name && (
                         <span className="block text-xs text-muted-foreground">{s.service_type.name}</span>
                       )}
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      {(s.duration_minutes ?? s.service_type?.duration_minutes)
+                        ? `${s.duration_minutes ?? s.service_type?.duration_minutes} min`
+                        : "—"}
                     </td>
                     <td className="px-4 py-3 text-right">{formatMoney((s.billed_cents / 100).toFixed(2))}</td>
                     <td className="px-4 py-3 text-right text-accent">
@@ -269,7 +325,7 @@ function BillingPage() {
                 ))}
                 {sessions.length === 0 && (
                   <tr>
-                    <td colSpan={8} className="px-4 py-10 text-center text-muted-foreground">
+                    <td colSpan={9} className="px-4 py-10 text-center text-muted-foreground">
                       No sessions logged yet. Click "Log Session" to add one.
                     </td>
                   </tr>
@@ -294,6 +350,7 @@ function BillingPage() {
 function TherapistsTab({ therapists }: { therapists: Therapist[] }) {
   const queryClient = useQueryClient();
   const saveTherapist = useServerFn(upsertTherapist);
+  const removeTherapist = useServerFn(deleteTherapist);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Therapist | null>(null);
   const [form, setForm] = useState({ name: "", email: "", split_percent: 55, active: true });
@@ -305,6 +362,16 @@ function TherapistsTab({ therapists }: { therapists: Therapist[] }) {
       setOpen(false);
       setEditing(null);
       toast.success("Therapist saved");
+    },
+    onError: (err: Error) => toast.error(err.message),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: removeTherapist,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["therapists"] });
+      queryClient.invalidateQueries({ queryKey: ["service-types"] });
+      toast.success("Therapist removed");
     },
     onError: (err: Error) => toast.error(err.message),
   });
@@ -410,6 +477,16 @@ function TherapistsTab({ therapists }: { therapists: Therapist[] }) {
                   <Button variant="ghost" size="icon" title="Edit" onClick={() => startEdit(t)}>
                     <Plus className="w-4 h-4 rotate-45" />
                   </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    title="Delete"
+                    onClick={() => {
+                      if (confirm(`Remove ${t.name}?`)) deleteMutation.mutate({ data: { id: t.id } });
+                    }}
+                  >
+                    <Trash2 className="w-4 h-4 text-destructive" />
+                  </Button>
                 </td>
               </tr>
             ))}
@@ -423,6 +500,7 @@ function TherapistsTab({ therapists }: { therapists: Therapist[] }) {
 function ServiceTypesTab({ therapists, serviceTypes }: { therapists: Therapist[]; serviceTypes: ServiceType[] }) {
   const queryClient = useQueryClient();
   const saveService = useServerFn(upsertServiceType);
+  const removeService = useServerFn(deleteServiceType);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<ServiceType | null>(null);
   const [form, setForm] = useState({
@@ -443,6 +521,15 @@ function ServiceTypesTab({ therapists, serviceTypes }: { therapists: Therapist[]
       setOpen(false);
       setEditing(null);
       toast.success("Service type saved");
+    },
+    onError: (err: Error) => toast.error(err.message),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: removeService,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["service-types"] });
+      toast.success("Service type removed");
     },
     onError: (err: Error) => toast.error(err.message),
   });
@@ -619,6 +706,16 @@ function ServiceTypesTab({ therapists, serviceTypes }: { therapists: Therapist[]
                     <Button variant="ghost" size="icon" title="Edit" onClick={() => startEdit(st)}>
                       <Plus className="w-4 h-4 rotate-45" />
                     </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      title="Delete"
+                      onClick={() => {
+                        if (confirm(`Remove ${st.name}?`)) deleteMutation.mutate({ data: { id: st.id } });
+                      }}
+                    >
+                      <Trash2 className="w-4 h-4 text-destructive" />
+                    </Button>
                   </td>
                 </tr>
               );
@@ -650,6 +747,7 @@ function SessionForm({
     client_insurance: initial?.client_insurance ?? "",
     session_date: initial?.session_date ?? new Date().toISOString().split("T")[0],
     is_intake: initial?.is_intake ?? false,
+    duration_minutes: initial?.duration_minutes?.toString() ?? "",
     units: initial?.units ?? 1,
     billed_cents: initial ? (initial.billed_cents / 100).toFixed(2) : "",
     split_percent: initial?.split_percent ?? therapists[0]?.split_percent ?? 55,
@@ -669,6 +767,7 @@ function SessionForm({
       client_insurance: form.client_insurance || null,
       session_date: form.session_date,
       is_intake: form.is_intake,
+      duration_minutes: form.duration_minutes ? Number(form.duration_minutes) : null,
       units: Number(form.units),
       billed_cents: cents,
       split_percent: Number(form.split_percent),
@@ -743,6 +842,19 @@ function SessionForm({
           />
         </div>
         <div className="space-y-2">
+          <Label>Visit Length (minutes)</Label>
+          <Input
+            type="number"
+            min={0}
+            value={form.duration_minutes}
+            onChange={(e) => setForm({ ...form, duration_minutes: e.target.value })}
+            placeholder="e.g. 53"
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
           <Label>Units</Label>
           <Input
             type="number"
@@ -764,6 +876,7 @@ function SessionForm({
               ...f,
               service_type_id: v,
               billed_cents: amount ? (amount / 100).toFixed(2) : f.billed_cents,
+              duration_minutes: st?.duration_minutes ? String(st.duration_minutes) : f.duration_minutes,
             }));
           }}
         >
