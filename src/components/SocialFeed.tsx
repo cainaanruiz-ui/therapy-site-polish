@@ -1,5 +1,4 @@
-import { useEffect } from "react";
-import { ArrowUpRight, Facebook, Instagram } from "lucide-react";
+import { ArrowUpRight, Facebook, Instagram, Music2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const FACEBOOK_URL = "https://www.facebook.com/people/Happy-2-Help-Counseling/61590639628174/";
@@ -7,18 +6,6 @@ const TIKTOK_URL = "https://www.tiktok.com/@happy2help59";
 const INSTAGRAM_URL = "https://www.instagram.com/happy2helpcounseling";
 
 export function SocialFeed() {
-  useEffect(() => {
-    const existingScript = document.querySelector<HTMLScriptElement>(
-      'script[src="https://www.tiktok.com/embed.js"]',
-    );
-
-    if (existingScript) return;
-
-    const script = document.createElement("script");
-    script.src = "https://www.tiktok.com/embed.js";
-    script.async = true;
-    document.body.appendChild(script);
-  }, []);
 
   return (
     <section className="border-y border-border bg-secondary/40" aria-labelledby="social-heading">
@@ -59,18 +46,28 @@ export function SocialFeed() {
               <div className="mb-3 px-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                 Latest on TikTok
               </div>
-              <blockquote
-                className="tiktok-embed mx-auto min-w-72 max-w-3xl"
-                cite={TIKTOK_URL}
-                data-unique-id="happy2help59"
-                data-embed-type="creator"
+              <a
+                href={TIKTOK_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="group relative flex h-[620px] flex-col items-center justify-center gap-6 overflow-hidden rounded-2xl bg-gradient-to-br from-[#25F4EE]/10 via-[#FE2C55]/5 to-background p-8 text-center transition-all hover:from-[#25F4EE]/20 hover:via-[#FE2C55]/10 hover:shadow-md"
               >
-                <section>
-                  <a href={TIKTOK_URL} target="_blank" rel="noreferrer">
-                    @happy2help59 on TikTok
-                  </a>
-                </section>
-              </blockquote>
+                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-foreground text-background shadow-lg transition-transform group-hover:scale-110">
+                  <Music2 size={36} />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="font-display text-2xl font-semibold text-foreground">
+                    @happy2help59
+                  </h3>
+                  <p className="max-w-[16rem] text-sm leading-relaxed text-muted-foreground">
+                    Short videos with practical mental wellness reminders and encouragement.
+                  </p>
+                </div>
+                <div className="inline-flex items-center gap-2 rounded-full border border-[#FE2C55]/30 bg-[#FE2C55]/10 px-5 py-2.5 text-sm font-medium text-[#FE2C55] transition-colors group-hover:bg-[#FE2C55] group-hover:text-white">
+                  Watch on TikTok <ArrowUpRight size={16} />
+                </div>
+                <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-[#25F4EE]/0 via-[#FE2C55] to-[#25F4EE]/0 opacity-0 transition-opacity group-hover:opacity-100" />
+              </a>
             </div>
 
             <div className="min-w-0 overflow-hidden rounded-3xl border border-border bg-background p-3 shadow-sm">
