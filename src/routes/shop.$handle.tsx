@@ -62,8 +62,19 @@ function ProductPage() {
     },
   });
   const [quantity, setQuantity] = useState(1);
+  const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
   const addItem = useCartStore((s) => s.addItem);
   const isAdding = useCartStore((s) => s.isLoading);
+
+  // Initialize selected options from the first available variant once loaded
+  if (product && Object.keys(selectedOptions).length === 0 && product.variants.edges.length > 0) {
+    const initial =
+      product.variants.edges.find((v) => v.node.availableForSale)?.node ??
+      product.variants.edges[0].node;
+    const opts: Record<string, string> = {};
+    for (const so of initial.selectedOptions ?? []) opts[so.name] = so.value;
+    setSelectedOptions(opts);
+  }
 
   if (isLoading) {
     return (
@@ -91,9 +102,28 @@ function ProductPage() {
     );
   }
 
+  const allVariants = product.variants.edges.map((e) => e.node);
+  const options = (product.options ?? []).filter(
+    (o) => o.values.length > 1 || o.name.toLowerCase() !== "title",
+  );
+
+  const matchesSelection = (v: (typeof allVariants)[number]) =>
+    (v.selectedOptions ?? []).every((so) => selectedOptions[so.name] === so.value);
+
   const variant =
-    product.variants.edges.find((v) => v.node.availableForSale)?.node ??
-    product.variants.edges[0]?.node;
+    allVariants.find(matchesSelection) ??
+    allVariants.find((v) => v.availableForSale) ??
+    allVariants[0];
+
+  const isValueAvailable = (name: string, value: string) =>
+    allVariants.some(
+      (v) =>
+        v.availableForSale &&
+        (v.selectedOptions ?? []).every((so) =>
+          so.name === name ? so.value === value : selectedOptions[so.name] === so.value,
+        ),
+    );
+
   const image = product.images.edges[0]?.node;
 
   const handleAdd = async () => {
@@ -143,6 +173,48 @@ function ProductPage() {
             <p className="mt-6 text-muted-foreground leading-relaxed whitespace-pre-line">
               {product.description}
             </p>
+
+            {options.length > 0 && (
+              <div className="mt-8 space-y-5">
+                {options.map((opt) => (
+                  <div key={opt.name}>
+                    <p className="text-sm font-medium text-foreground mb-2">
+                      {opt.name}
+                      {selectedOptions[opt.name] && (
+                        <span className="text-muted-foreground font-normal">
+                          {" "}
+                          — {selectedOptions[opt.name]}
+                        </span>
+                      )}
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {opt.values.map((value) => {
+                        const selected = selectedOptions[opt.name] === value;
+                        const available = isValueAvailable(opt.name, value);
+                        return (
+                          <button
+                            key={value}
+                            type="button"
+                            onClick={() =>
+                              setSelectedOptions((prev) => ({ ...prev, [opt.name]: value }))
+                            }
+                            className={`rounded-full border px-4 py-2 text-sm transition-colors ${
+                              selected
+                                ? "border-primary bg-primary text-primary-foreground"
+                                : available
+                                  ? "border-border bg-background text-foreground hover:border-primary/60"
+                                  : "border-border/60 bg-secondary/40 text-muted-foreground/60 line-through"
+                            }`}
+                          >
+                            {value}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
 
             <div className="mt-8 flex items-center gap-4">
               <div className="inline-flex items-center border border-border rounded-full">
