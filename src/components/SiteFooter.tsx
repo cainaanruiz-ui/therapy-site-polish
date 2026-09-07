@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Facebook, Mail, MapPin, Music2, Phone } from "lucide-react";
+import { Facebook, Instagram, Mail, MapPin, Music2, Phone } from "lucide-react";
 import logo from "@/assets/logo.png";
 
 export function SiteFooter() {
@@ -29,6 +29,15 @@ export function SiteFooter() {
               className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
             >
               <Music2 size={17} />
+            </a>
+            <a
+              href="https://www.instagram.com/happy2helpcounseling/"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Happy 2 Help Counseling on Instagram"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
+            >
+              <Instagram size={17} />
             </a>
           </div>
         </div>

@@ -20,6 +20,9 @@ export const Route = createFileRoute("/contact")({
 function ContactPage() {
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
+  const today = new Date().toISOString().slice(0, 10);
+
+
 
   return (
     <SiteLayout>
@@ -40,10 +43,20 @@ function ContactPage() {
             e.preventDefault();
             const form = e.currentTarget;
             const data = new FormData(form);
+            const date = String(data.get("date") || "");
+            const time = String(data.get("time") || "");
+            const altTimes = String(data.get("times") || "");
+            const preferred = [
+              date ? `Preferred date: ${formatDate(date)}` : "",
+              time ? `Preferred time: ${formatTime(time)}` : "",
+              altTimes ? `Other times that work: ${altTimes}` : "",
+            ]
+              .filter(Boolean)
+              .join(" | ");
             const payload = {
               name: String(data.get("name") || ""),
               email: String(data.get("email") || ""),
-              times: String(data.get("times") || ""),
+              times: preferred,
               message: String(data.get("message") || ""),
             };
             setStatus("sending");
@@ -73,8 +86,32 @@ function ContactPage() {
           <h2 className="font-display text-2xl text-primary">Booking Request</h2>
           <Field name="name" label="Full name" required />
           <Field name="email" label="Your email" type="email" required />
-          <Field name="times" label="Preferred days/times" />
+          <div className="grid sm:grid-cols-2 gap-4">
+            <Field name="date" label="Preferred date" type="date" min={today} />
+            <label className="block">
+              <span className="text-xs uppercase tracking-widest text-muted-foreground">
+                Preferred time
+              </span>
+              <select
+                name="time"
+                defaultValue=""
+                className="mt-1.5 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring/40"
+              >
+                <option value="">Select a time</option>
+                {TIME_SLOTS.map((slot) => (
+                  <option key={slot} value={slot}>
+                    {formatTime(slot)}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+          <Field name="times" label="Other days/times that work" />
           <Field name="message" label="Message" textarea />
+          <p className="text-xs text-muted-foreground">
+            Choosing a day and time sends it with your request. Luis will call or email you to
+            confirm the appointment.
+          </p>
           <button
             type="submit"
             disabled={status === "sending"}
@@ -155,18 +192,50 @@ function ContactPage() {
   );
 }
 
+const TIME_SLOTS = [
+  "09:00",
+  "10:00",
+  "11:00",
+  "12:00",
+  "13:00",
+  "14:00",
+  "15:00",
+  "16:00",
+  "17:00",
+  "18:00",
+];
+
+function formatTime(value: string) {
+  const [h, m] = value.split(":").map(Number);
+  const suffix = h >= 12 ? "PM" : "AM";
+  const hour12 = h % 12 === 0 ? 12 : h % 12;
+  return `${hour12}:${String(m).padStart(2, "0")} ${suffix}`;
+}
+
+function formatDate(value: string) {
+  const [y, m, d] = value.split("-").map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
 function Field({
   name,
   label,
   type = "text",
   required,
   textarea,
+  min,
 }: {
   name: string;
   label: string;
   type?: string;
   required?: boolean;
   textarea?: boolean;
+  min?: string;
 }) {
   const cls =
     "mt-1.5 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring/40";
@@ -179,7 +248,7 @@ function Field({
       {textarea ? (
         <textarea name={name} rows={5} required={required} className={cls} />
       ) : (
-        <input name={name} type={type} required={required} className={cls} />
+        <input name={name} type={type} min={min} required={required} className={cls} />
       )}
     </label>
   );
