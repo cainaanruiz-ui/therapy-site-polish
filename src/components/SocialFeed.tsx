@@ -162,7 +162,8 @@ export function SocialFeed() {
               </a>
             </div>
 
-            <div className="min-w-0 overflow-hidden rounded-3xl border border-border bg-background p-3 shadow-sm sm:col-span-2">
+            <div className="min-w-0 overflow-hidden rounded-3xl border border-border bg-background p-3 shadow-sm">
+
               <div className="mb-3 px-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                 Latest on Instagram
               </div>
