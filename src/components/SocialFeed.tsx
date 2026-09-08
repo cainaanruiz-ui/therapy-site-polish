@@ -141,14 +141,14 @@ export function SocialFeed() {
                 href={FACEBOOK_URL}
                 target="_blank"
                 rel="noreferrer"
-                className="group relative flex h-56 flex-col items-center justify-center gap-4 overflow-hidden rounded-2xl bg-gradient-to-br from-[#1877F2]/10 via-[#1877F2]/5 to-background p-8 text-center transition-all hover:from-[#1877F2]/20 hover:via-[#1877F2]/10 hover:shadow-md"
+                className="group relative flex h-72 flex-col items-center justify-center gap-3 overflow-hidden rounded-2xl bg-gradient-to-br from-[#1877F2]/10 via-[#1877F2]/5 to-background p-8 text-center transition-all hover:from-[#1877F2]/20 hover:via-[#1877F2]/10 hover:shadow-md"
               >
                 <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#1877F2] text-white shadow-lg transition-transform group-hover:scale-110">
                   <Facebook size={30} />
                 </div>
 
                 <div className="space-y-2">
-                  <h3 className="font-display text-2xl font-semibold text-foreground">
+                  <h3 className="font-display text-xl font-semibold text-foreground">
                     Happy 2 Help Counseling
                   </h3>
                   <p className="max-w-[16rem] text-sm leading-relaxed text-muted-foreground">
@@ -171,13 +171,13 @@ export function SocialFeed() {
                 href={INSTAGRAM_URL}
                 target="_blank"
                 rel="noreferrer"
-                className="group relative flex h-56 flex-col items-center justify-center gap-4 overflow-hidden rounded-2xl bg-gradient-to-br from-[#833AB4]/10 via-[#FD1D1D]/5 to-[#FCB045]/10 p-8 text-center transition-all hover:from-[#833AB4]/20 hover:via-[#FD1D1D]/10 hover:to-[#FCB045]/20 hover:shadow-md"
+                className="group relative flex h-72 flex-col items-center justify-center gap-3 overflow-hidden rounded-2xl bg-gradient-to-br from-[#833AB4]/10 via-[#FD1D1D]/5 to-[#FCB045]/10 p-8 text-center transition-all hover:from-[#833AB4]/20 hover:via-[#FD1D1D]/10 hover:to-[#FCB045]/20 hover:shadow-md"
               >
                 <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[#833AB4] via-[#FD1D1D] to-[#FCB045] text-white shadow-lg transition-transform group-hover:scale-110">
                   <Instagram size={30} />
                 </div>
                 <div className="space-y-1">
-                  <h3 className="font-display text-2xl font-semibold text-foreground">
+                  <h3 className="font-display text-xl font-semibold text-foreground">
                     @happy2helpcounseling
                   </h3>
                   <p className="text-sm leading-relaxed text-muted-foreground">
