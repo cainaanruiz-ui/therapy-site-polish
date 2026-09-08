@@ -141,11 +141,12 @@ export function SocialFeed() {
                 href={FACEBOOK_URL}
                 target="_blank"
                 rel="noreferrer"
-                className="group relative flex h-[620px] flex-col items-center justify-center gap-6 overflow-hidden rounded-2xl bg-gradient-to-br from-[#1877F2]/10 via-[#1877F2]/5 to-background p-8 text-center transition-all hover:from-[#1877F2]/20 hover:via-[#1877F2]/10 hover:shadow-md"
+                className="group relative flex h-56 flex-col items-center justify-center gap-4 overflow-hidden rounded-2xl bg-gradient-to-br from-[#1877F2]/10 via-[#1877F2]/5 to-background p-8 text-center transition-all hover:from-[#1877F2]/20 hover:via-[#1877F2]/10 hover:shadow-md"
               >
-                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[#1877F2] text-white shadow-lg transition-transform group-hover:scale-110">
-                  <Facebook size={36} />
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#1877F2] text-white shadow-lg transition-transform group-hover:scale-110">
+                  <Facebook size={30} />
                 </div>
+
                 <div className="space-y-2">
                   <h3 className="font-display text-2xl font-semibold text-foreground">
                     Happy 2 Help Counseling
