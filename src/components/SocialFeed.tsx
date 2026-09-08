@@ -60,33 +60,78 @@ export function SocialFeed() {
           </div>
 
           <div className="grid min-w-0 gap-6 sm:grid-cols-2">
-            <div className="min-w-0 overflow-hidden rounded-3xl border border-border bg-background p-3 shadow-sm">
-              <div className="mb-3 px-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                Latest on TikTok
+            <div className="min-w-0 overflow-hidden rounded-3xl border border-border bg-background p-3 shadow-sm sm:col-span-2">
+              <div className="mb-3 flex items-center justify-between gap-3 px-2">
+                <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                  Latest on TikTok
+                </span>
+                <a
+                  href={TIKTOK_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1 text-xs font-medium text-[#FE2C55]"
+                >
+                  @happy2help59 <ArrowUpRight size={14} />
+                </a>
               </div>
-              <a
-                href={TIKTOK_URL}
-                target="_blank"
-                rel="noreferrer"
-                className="group relative flex h-[620px] flex-col items-center justify-center gap-6 overflow-hidden rounded-2xl bg-gradient-to-br from-[#25F4EE]/10 via-[#FE2C55]/5 to-background p-8 text-center transition-all hover:from-[#25F4EE]/20 hover:via-[#FE2C55]/10 hover:shadow-md"
-              >
-                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-foreground text-background shadow-lg transition-transform group-hover:scale-110">
-                  <Music2 size={36} />
+
+              {videos.length > 0 ? (
+                <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+                  {videos.slice(0, 6).map((video) => (
+                    <a
+                      key={video.id}
+                      href={video.shareUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="group relative block aspect-[9/16] overflow-hidden rounded-2xl bg-secondary"
+                    >
+                      {video.coverImageUrl ? (
+                        <img
+                          src={video.coverImageUrl}
+                          alt={video.title || "Happy 2 Help TikTok video"}
+                          loading="lazy"
+                          referrerPolicy="no-referrer"
+                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                      ) : null}
+                      <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-foreground/10 to-transparent" />
+                      <div className="absolute inset-x-0 bottom-0 space-y-1 p-3 text-left">
+                        <p className="line-clamp-2 text-xs font-medium leading-snug text-background">
+                          {video.title}
+                        </p>
+                        <div className="flex items-center gap-3 text-[11px] text-background/80">
+                          <span className="inline-flex items-center gap-1">
+                            <Play size={11} /> {formatCount(video.viewCount)}
+                          </span>
+                          <span className="inline-flex items-center gap-1">
+                            <Heart size={11} /> {formatCount(video.likeCount)}
+                          </span>
+                        </div>
+                      </div>
+                    </a>
+                  ))}
                 </div>
-                <div className="space-y-2">
-                  <h3 className="font-display text-2xl font-semibold text-foreground">
-                    @happy2help59
-                  </h3>
-                  <p className="max-w-[16rem] text-sm leading-relaxed text-muted-foreground">
+              ) : (
+                <a
+                  href={TIKTOK_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="group relative flex h-56 flex-col items-center justify-center gap-4 overflow-hidden rounded-2xl bg-gradient-to-br from-[#25F4EE]/10 via-[#FE2C55]/5 to-background p-8 text-center transition-all hover:shadow-md"
+                >
+                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-foreground text-background shadow-lg transition-transform group-hover:scale-110">
+                    <Music2 size={30} />
+                  </div>
+                  <p className="max-w-[18rem] text-sm leading-relaxed text-muted-foreground">
                     Short videos with practical mental wellness reminders and encouragement.
                   </p>
-                </div>
-                <div className="inline-flex items-center gap-2 rounded-full border border-[#FE2C55]/30 bg-[#FE2C55]/10 px-5 py-2.5 text-sm font-medium text-[#FE2C55] transition-colors group-hover:bg-[#FE2C55] group-hover:text-white">
-                  Watch on TikTok <ArrowUpRight size={16} />
-                </div>
-                <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-[#25F4EE]/0 via-[#FE2C55] to-[#25F4EE]/0 opacity-0 transition-opacity group-hover:opacity-100" />
-              </a>
+                  <div className="inline-flex items-center gap-2 rounded-full border border-[#FE2C55]/30 bg-[#FE2C55]/10 px-5 py-2 text-sm font-medium text-[#FE2C55]">
+                    Watch on TikTok <ArrowUpRight size={16} />
+                  </div>
+                </a>
+              )}
             </div>
+
+
 
             <div className="min-w-0 overflow-hidden rounded-3xl border border-border bg-background p-3 shadow-sm">
               <div className="mb-3 px-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
