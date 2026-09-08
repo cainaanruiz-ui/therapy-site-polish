@@ -1,11 +1,29 @@
-import { ArrowUpRight, Facebook, Instagram, Music2 } from "lucide-react";
+import { ArrowUpRight, Facebook, Heart, Instagram, Music2, Play } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
+import { getTikTokVideos } from "@/lib/social.functions";
 
 const FACEBOOK_URL = "https://www.facebook.com/people/Happy-2-Help-Counseling/61590639628174/";
 const TIKTOK_URL = "https://www.tiktok.com/@happy2help59";
 const INSTAGRAM_URL = "https://www.instagram.com/happy2helpcounseling";
 
+function formatCount(n: number) {
+  if (n >= 1000000) return `${(n / 1000000).toFixed(1)}M`;
+  if (n >= 1000) return `${(n / 1000).toFixed(1)}K`;
+  return String(n);
+}
+
 export function SocialFeed() {
+  const fetchVideos = useServerFn(getTikTokVideos);
+  const { data: videos = [] } = useQuery({
+    queryKey: ["tiktok-videos"],
+    queryFn: () => fetchVideos(),
+    staleTime: 1000 * 60 * 30,
+    retry: 1,
+  });
+
+
 
   return (
     <section className="border-y border-border bg-secondary/40" aria-labelledby="social-heading">
