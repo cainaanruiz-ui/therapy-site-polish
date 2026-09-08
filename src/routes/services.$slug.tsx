@@ -417,7 +417,7 @@ function ServiceDetailPage() {
           <p className="mt-5 text-lg text-muted-foreground">{service.tagline}</p>
           <div className="mt-7 flex flex-wrap gap-3">
             <Link to="/contact" className="inline-flex items-center gap-2 rounded-full bg-primary text-primary-foreground px-6 py-3 text-sm font-medium hover:bg-primary/90">
-              Book a Session <ArrowRight size={16} />
+              Book a Consultation <ArrowRight size={16} />
             </Link>
             <a href="https://www.therapyportal.com/p/h2hcounseling/" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full border border-primary/20 text-primary px-6 py-3 text-sm font-medium hover:bg-secondary">Client Portal</a>
           </div>

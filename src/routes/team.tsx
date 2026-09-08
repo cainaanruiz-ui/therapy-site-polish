@@ -81,7 +81,7 @@ function TeamPage() {
           <h2 className="font-display text-3xl md:text-4xl text-primary">Ready to take the next step?</h2>
           <p className="mt-3 text-muted-foreground max-w-xl mx-auto">We'd be honored to support you. Schedule a consultation and we'll match you with the right fit.</p>
           <div className="mt-6 flex flex-wrap gap-3 justify-center">
-            <Link to="/contact" className="inline-flex items-center rounded-full bg-primary text-primary-foreground px-6 py-3 text-sm font-medium hover:bg-primary/90">Book a Session</Link>
+            <Link to="/contact" className="inline-flex items-center rounded-full bg-primary text-primary-foreground px-6 py-3 text-sm font-medium hover:bg-primary/90">Book a Consultation</Link>
             <Link to="/services" className="inline-flex items-center rounded-full border border-primary/20 text-primary px-6 py-3 text-sm font-medium hover:bg-background">Explore Services</Link>
           </div>
         </div>

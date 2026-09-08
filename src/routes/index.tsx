@@ -38,7 +38,7 @@ function Index() {
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link to="/contact" className="inline-flex items-center gap-2 rounded-full bg-primary text-primary-foreground px-6 py-3 font-medium hover:opacity-90">
-                Book a session <ArrowRight size={16} />
+                Book a Consultation <ArrowRight size={16} />
               </Link>
               <Link to="/services" className="inline-flex items-center gap-2 rounded-full border border-border px-6 py-3 font-medium hover:bg-accent/30">
                 Explore services
